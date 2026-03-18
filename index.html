@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Did you take your medicine today?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .date-display {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 24px;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 24px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-yes {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-no {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .history-title {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        
+        .medicine-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .medicine-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .medicine-time {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .medicine-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-taken {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .btn-close {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>💊 Did you take your medicine today?</h1>
+            <p class="subtitle">健康提醒小程序</p>
+            <div class="date-display" id="dateDisplay"></div>
+            <div class="question">你今天吃药了吗？</div>
+            <button class="btn btn-yes" onclick="markTaken()">✅ 是的，吃过了</button>
+            <button class="btn btn-no" onclick="markNotTaken()">❌ 还没有</button>
+        </div>
+        
+        <div class="card">
+            <h3 class="history-title">💊 我的药物</h3>
+            <div id="medicineList"></div>
+            <button class="btn btn-add" onclick="openModal()">➕ 添加药物</button>
+        </div>
+        
+        <div class="card">
+            <h3 class="history-title">📊 今日记录</h3>
+            <div id="todayRecord"></div>
+        </div>
+    </div>
+    
+    <!-- 添加药物弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-title">添加新药物</div>
+            <div class="input-group">
+                <label>药物名称</label>
+                <input type="text" id="medicineName" placeholder="例如：维生素C">
+            </div>
+            <div class="input-group">
+                <label>提醒时间</label>
+                <input type="time" id="medicineTime" value="09:00">
+            </div>
+            <div class="input-group">
+                <label>剂量说明</label>
+                <input type="text" id="medicineDose" placeholder="例如：1片">
+            </div>
+            <button class="btn btn-add" onclick="addMedicine()">保存</button>
+            <button class="btn btn-close" onclick="closeModal()">取消</button>
+        </div>
+    </div>
+
+    <script>
+        // 初始化
+        let medicines = JSON.parse(localStorage.getItem('medicines') || '[]');
+        let records = JSON.parse(localStorage.getItem('records') || '{}');
+        
+        // 显示日期
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('zh-CN', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            weekday: 'long'
+        });
+        document.getElementById('dateDisplay').textContent = dateStr;
+        
+        // 请求通知权限
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+        
+        // 检查是否需要提醒
+        checkReminders();
+        
+        // 渲染药物列表
+        renderMedicines();
+        
+        // 渲染今日记录
+        renderTodayRecord();
+        
+        function renderMedicines() {
+            const list = document.getElementById('medicineList');
+            if (medicines.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无药物，请添加</div>';
+                return;
+            }
+            
+            list.innerHTML = medicines.map((med, index) => {
+                const todayKey = getTodayKey();
+                const taken = records[todayKey]?.includes(med.name);
+                return `
+                    <div class="medicine-item">
+                        <div>
+                            <div class="medicine-name">${med.name}</div>
+                            <div class="medicine-time">${med.time} · ${med.dose}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="medicine-status ${taken ? 'status-taken' : 'status-pending'}">
+                                ${taken ? '已服用' : '待服用'}
+                            </span>
+                            <button class="delete-btn" onclick="deleteMedicine(${index})">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderTodayRecord() {
+            const todayKey = getTodayKey();
+            const takenList = records[todayKey] || [];
+            const list = document.getElementById('todayRecord');
+            
+            if (takenList.length === 0) {
+                list.innerHTML = '<div class="empty-state">今日尚未记录</div>';
+                return;
+            }
+            
+            list.innerHTML = `
+                <div class="medicine-item">
+                    <span>✅ 今日已服用: ${takenList.join(', ')}</span>
+                </div>
+            `;
+        }
+        
+        function getTodayKey() {
+            return new Date().toISOString().split('T')[0];
+        }
+        
+        function markTaken() {
+            const todayKey = getTodayKey();
+            if (!records[todayKey]) {
+                records[todayKey] = [];
+            }
+            
+            // 将所有未服用的药物标记为已服用
+            medicines.forEach(med => {
+                if (!records[todayKey].includes(med.name)) {
+                    records[todayKey].push(med.name);
+                }
+            });
+            
+            localStorage.setItem('records', JSON.stringify(records));
+            renderMedicines();
+            renderTodayRecord();
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('💊 服药记录', {
+                    body: '已记录今日服药！',
+                    icon: '💊'
+                });
+            }
+        }
+        
+        function markNotTaken() {
+            alert('好的，记得稍后服用哦！');
+        }
+        
+        function openModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+        
+        function addMedicine() {
+            const name = document.getElementById('medicineName').value.trim();
+            const time = document.getElementById('medicineTime').value;
+            const dose = document.getElementById('medicineDose').value.trim();
+            
+            if (!name || !time) {
+                alert('请填写药物名称和时间');
+                return;
+            }
+            
+            medicines.push({ name, time, dose: dose || '1片' });
+            localStorage.setItem('medicines', JSON.stringify(medicines));
+            
+            closeModal();
+            document.getElementById('medicineName').value = '';
+            document.getElementById('medicineDose').value = '';
+            
+            renderMedicines();
+        }
+        
+        function deleteMedicine(index) {
+            if (confirm('确定要删除这个药物吗？')) {
+                medicines.splice(index, 1);
+                localStorage.setItem('medicines', JSON.stringify(medicines));
+                renderMedicines();
+            }
+        }
+        
+        // 定时检查提醒
+        function checkReminders() {
+            setInterval(() => {
+                const now = new Date();
+                const currentTime = now.toTimeString().slice(0, 5);
+                
+                medicines.forEach(med => {
+                    if (med.time === currentTime) {
+                        const todayKey = getTodayKey();
+                        const taken = records[todayKey]?.includes(med.name);
+                        
+                        if (!taken && 'Notification' in window && Notification.permission === 'granted') {
+                            new Notification('💊 服药提醒', {
+                                body: `该服用 ${med.name} (${med.dose}) 了！`,
+                                icon: '💊',
+                                requireInteraction: true
+                            });
+                        }
+                    }
+                });
+            }, 60000); // 每分钟检查一次
+        }
+    </script>
+</body>
+</html>

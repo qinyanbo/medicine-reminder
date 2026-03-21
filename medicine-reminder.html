@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💊 你今天吃药了吗？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        
+        .date-display {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 16px;
+        }
+        
+        .question {
+            text-align: center;
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 12px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-yes {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-no {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .history-title {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        
+        .medicine-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .medicine-info {
+            flex: 1;
+        }
+        
+        .medicine-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .medicine-detail {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .medicine-status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .status-taken {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-size: 14px;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .modal-buttons .btn {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .btn-close {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .edit-btn {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .history-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+        
+        .history-day {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-width: 50px;
+        }
+        
+        .history-day-name {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .history-day-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 4px;
+        }
+        
+        .history-day-status {
+            font-size: 18px;
+            margin-top: 4px;
+        }
+        
+        .notification-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 16px;
+        }
+        
+        .notification-hint a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .login-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            .question {
+                font-size: 24px;
+            }
+            
+            .btn {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 右上角登录/用户信息 -->
+        <div id="userSection" style="text-align: right; margin-bottom: 16px;">
+            <a href="login.html" id="loginLink" class="btn" style="display: inline-block; width: auto; padding: 10px 20px; text-decoration: none; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; border-radius: 10px; font-size: 14px;"> Sign In </a>
+            <div id="userInfo" style="display: none; align-items: center; justify-content: flex-end; gap: 12px;">
+                <img id="userAvatar" src="" alt="avatar" style="width: 36px; height: 36px; border-radius: 50%;">
+                <span id="userName" style="color: white; font-weight: 600;"></span>
+                <button onclick="logout()" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">退出</button>
+            </div>
+        </div>
+        
+        <!-- 主页 -->
+        <div class="card" id="mainCard">
+            <h1>💊 你今天吃药了吗？</h1>
+            <p class="subtitle">健康提醒小程序</p>
+            <div class="date-display" id="dateDisplay"></div>
+            <div class="question">你今天吃药了吗？</div>
+            <button class="btn btn-yes" onclick="markAllTaken()">✅ 是的，吃过了</button>
+            <button class="btn btn-no" onclick="remindLater()">❌ 还没有</button>
+        </div>
+        
+        <!-- 药物列表 -->
+        <div class="card" id="medicineCard">
+            <h3 class="history-title">💊 我的药物</h3>
+            <div id="medicineList"></div>
+            <button class="btn btn-add" onclick="openAddModal()">➕ 添加药物</button>
+        </div>
+        
+        <!-- 7天历史 -->
+        <div class="card" id="historyCard">
+            <h3 class="history-title">📅 7天服药记录</h3>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+    
+    <!-- 添加/编辑药物弹窗 -->
+    <div class="modal" id="medicineModal">
+        <div class="modal-content">
+            <div class="modal-title" id="modalTitle">添加新药物</div>
+            <div class="input-group">
+                <label>药物名称 *</label>
+                <input type="text" id="medicineName" placeholder="例如：维生素C">
+            </div>
+            <div class="input-group">
+                <label>提醒时间 *</label>
+                <input type="time" id="medicineTime" value="09:00">
+            </div>
+            <div class="input-group">
+                <label>剂量说明</label>
+                <input type="text" id="medicineDose" placeholder="例如：1片">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-close" onclick="closeModal()">取消</button>
+                <button class="btn btn-save" id="saveBtn" onclick="saveMedicine()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-hint" id="notificationHint">
+        开启通知权限，接收服药提醒 <a href="#" onclick="requestNotification()">点击开启</a>
+    </div>
+
+    <script>
+        // 数据存储键名
+        const STORAGE_MEDICINES = 'medicines';
+        const STORAGE_RECORDS = 'records';
+        
+        // 状态
+        let medicines = [];
+        let records = {};  // { "2026-03-17": ["维生素C", "钙片"], ... }
+        let editingMedicineId = null;
+        
+        // 登录状态
+        const LOGIN_API = 'https://user-auth-worker.aliboit888.workers.dev';
+        
+        // 初始化
+        function init() {
+            // 检查登录状态
+            checkLoginStatus();
+            loadData();
+            renderUI();
+            requestNotificationPermission();
+            startReminderCheck();
+        }
+        
+        // 检查登录状态
+        function checkLoginStatus() {
+            // 先从 URL 参数读取登录信息
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            const urlEmail = params.get('email');
+            const urlName = params.get('name');
+            const urlPicture = params.get('picture');
+            
+            if (urlToken) {
+                // 保存登录信息到 localStorage
+                localStorage.setItem('auth_token', urlToken);
+                localStorage.setItem('user_email', urlEmail || '');
+                localStorage.setItem('user_name', urlName || '');
+                localStorage.setItem('user_picture', urlPicture || '');
+                // 清除 URL 参数
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+            
+            const token = localStorage.getItem('auth_token');
+            const userEmail = localStorage.getItem('user_email');
+            const userName = localStorage.getItem('user_name');
+            const userPicture = localStorage.getItem('user_picture');
+            
+            if (token && userEmail) {
+                // 已登录，显示用户信息
+                document.getElementById('loginLink').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'flex';
+                document.getElementById('userName').textContent = userName || userEmail;
+                if (userPicture) {
+                    document.getElementById('userAvatar').src = userPicture;
+                    document.getElementById('userAvatar').style.display = 'block';
+                }
+            } else {
+                // 未登录，显示登录按钮
+                document.getElementById('loginLink').style.display = 'inline-block';
+                document.getElementById('userInfo').style.display = 'none';
+            }
+        }
+        
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_picture');
+            checkLoginStatus();
+            alert('已退出登录');
+        }
+        
+        // 从 LocalStorage 加载数据
+        function loadData() {
+            try {
+                const meds = localStorage.getItem(STORAGE_MEDICINES);
+                const recs = localStorage.getItem(STORAGE_RECORDS);
+                medicines = meds ? JSON.parse(meds) : [];
+                records = recs ? JSON.parse(recs) : {};
+            } catch (e) {
+                console.error('Failed to load data:', e);
+                medicines = [];
+                records = {};
+            }
+        }
+        
+        // 保存数据到 LocalStorage
+        function saveData() {
+            try {
+                // 清理30天前的记录
+                cleanupOldRecords();
+                localStorage.setItem(STORAGE_MEDICINES, JSON.stringify(medicines));
+                localStorage.setItem(STORAGE_RECORDS, JSON.stringify(records));
+            } catch (e) {
+                console.error('Failed to save data:', e);
+            }
+        }
+        
+        // 清理30天前的记录
+        function cleanupOldRecords() {
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            const cutoffDate = thirtyDaysAgo.toISOString().split('T')[0];
+            
+            Object.keys(records).forEach(date => {
+                if (date < cutoffDate) {
+                    delete records[date];
+                }
+            });
+        }
+        
+        // 渲染UI
+        function renderUI() {
+            renderDate();
+            renderMedicines();
+            renderHistory();
+        }
+        
+        // 显示日期
+        function renderDate() {
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('dateDisplay').textContent = dateStr;
+        }
+        
+        // 渲染药物列表
+        function renderMedicines() {
+            const list = document.getElementById('medicineList');
+            const todayKey = getTodayKey();
+            const takenToday = records[todayKey] || [];
+            
+            if (medicines.length === 0) {
+                list.innerHTML = '<div class="empty-state">暂无药物，请添加您的第一个药物</div>';
+                return;
+            }
+            
+            list.innerHTML = medicines.map(med => {
+                const taken = takenToday.includes(med.name);
+                return `
+                    <div class="medicine-item">
+                        <div class="medicine-info">
+                            <div class="medicine-name">${med.name}</div>
+                            <div class="medicine-detail">⏰ ${med.time} · 💊 ${med.dose}</div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="medicine-status ${taken ? 'status-taken' : 'status-pending'}">
+                                ${taken ? '✅ 已服用' : '⏳ 待服用'}
+                            </span>
+                            <button class="edit-btn" onclick="editMedicine(${med.id})">编辑</button>
+                            <button class="delete-btn" onclick="deleteMedicine(${med.id})">删除</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 渲染7天历史
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const today = new Date();
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            
+            let html = '';
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayName = dayNames[date.getDay()];
+                const dayNum = date.getDate();
+                const taken = (records[dateStr] || []).length;
+                const total = medicines.length;
+                
+                let status = '';
+                if (total === 0) {
+                    status = '⚪';
+                } else if (taken === 0) {
+                    status = '❌';
+                } else if (taken < total) {
+                    status = '◐';
+                } else {
+                    status = '✅';
+                }
+                
+                html += `
+                    <div class="history-day">
+                        <span class="history-day-name">周${dayName}</span>
+                        <span class="history-day-date">${dayNum}</span>
+                        <span class="history-day-status">${status}</span>
+                    </div>
+                `;
+            }
+            
+            list.innerHTML = html;
+        }
+        
+        // 获取今日日期字符串
+        function getTodayKey() {
+            return new Date().toISOString().split('T')[0];
+        }
+        
+        // 标记所有药物已服用
+        function markAllTaken() {
+            const todayKey = getTodayKey();
+            const takenToday = records[todayKey] || [];
+            
+            // 将所有药物标记为已服用
+            medicines.forEach(med => {
+                if (!takenToday.includes(med.name)) {
+                    takenToday.push(med.name);
+                }
+            });
+            
+            records[todayKey] = takenToday;
+            saveData();
+            renderMedicines();
+            renderHistory();
+            
+            // 显示通知
+            if (takenToday.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
+                new Notification('💊 服药记录成功', {
+                    body: `已记录 ${takenToday.length} 种药物，今日服药完成！`,
+                    icon: '💊'
+                });
+            }
+            
+            alert('✅ 已记录今日服药！');
+        }
+        
+        // 稍后提醒
+        function remindLater() {
+            alert('好的，记得稍后服用哦！');
+        }
+        
+        // 打开添加弹窗
+        function openAddModal() {
+            editingMedicineId = null;
+            document.getElementById('modalTitle').textContent = '添加新药物';
+            document.getElementById('medicineName').value = '';
+            document.getElementById('medicineTime').value = '09:00';
+            document.getElementById('medicineDose').value = '';
+            document.getElementById('saveBtn').textContent = '添加';
+            document.getElementById('medicineModal').classList.add('active');
+        }
+        
+        // 编辑药物
+        function editMedicine(id) {
+            const med = medicines.find(m => m.id === id);
+            if (!med) return;
+            
+            editingMedicineId = id;
+            document.getElementById('modalTitle').textContent = '编辑药物';
+            document.getElementById('medicineName').value = med.name;
+            document.getElementById('medicineTime').value = med.time;
+            document.getElementById('medicineDose').value = med.dose;
+            document.getElementById('saveBtn').textContent = '保存';
+            document.getElementById('medicineModal').classList.add('active');
+        }
+        
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('medicineModal').classList.remove('active');
+            editingMedicineId = null;
+        }
+        
+        // 保存药物
+        function saveMedicine() {
+            const name = document.getElementById('medicineName').value.trim();
+            const time = document.getElementById('medicineTime').value;
+            const dose = document.getElementById('medicineDose').value.trim() || '1片';
+            
+            if (!name) {
+                alert('请填写药物名称');
+                return;
+            }
+            
+            if (!time) {
+                alert('请选择提醒时间');
+                return;
+            }
+            
+            if (editingMedicineId) {
+                // 编辑
+                const med = medicines.find(m => m.id === editingMedicineId);
+                if (med) {
+                    med.name = name;
+                    med.time = time;
+                    med.dose = dose;
+                }
+            } else {
+                // 添加
+                medicines.push({
+                    id: Date.now(),
+                    name: name,
+                    time: time,
+                    dose: dose
+                });
+            }
+            
+            saveData();
+            closeModal();
+            renderMedicines();
+            renderHistory();
+        }
+        
+        // 删除药物
+        function deleteMedicine(id) {
+            if (!confirm('确定要删除这个药物吗？')) return;
+            
+            medicines = medicines.filter(m => m.id !== id);
+            saveData();
+            renderMedicines();
+            renderHistory();
+        }
+        
+        // 请求通知权限
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                document.getElementById('notificationHint').style.display = 'none';
+                return;
+            }
+            
+            if (Notification.permission === 'granted') {
+                document.getElementById('notificationHint').textContent = '🔔 通知权限已开启';
+            } else if (Notification.permission === 'denied') {
+                document.getElementById('notificationHint').innerHTML = '❌ 通知被禁用，请在浏览器设置中开启';
+            }
+        }
+        
+        // 用户手动请求通知
+        function requestNotification() {
+            if ('Notification' in window) {
+                Notification.requestPermission();
+            }
+            return false;
+        }
+        
+        // 定时检查提醒
+        function startReminderCheck() {
+            // 每分钟检查一次
+            setInterval(() => {
+                if (!('Notification' in window) || Notification.permission !== 'granted') {
+                    return;
+                }
+                
+                const now = new Date();
+                const currentTime = now.toTimeString().slice(0, 5);
+                const todayKey = getTodayKey();
+                const takenToday = records[todayKey] || [];
+                
+                medicines.forEach(med => {
+                    if (med.time === currentTime && !takenToday.includes(med.name)) {
+                        new Notification('💊 服药提醒', {
+                            body: `该服用 ${med.name} (${med.dose}) 了！`,
+                            icon: '💊',
+                            requireInteraction: true
+                        });
+                    }
+                });
+            }, 60000);
+        }
+        
+        // 启动
+        init();
+    </script>
+</body>
+</html>

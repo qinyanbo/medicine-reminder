@@ -93,6 +93,17 @@
             color: white;
         }
         
+        .btn-login {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+            color: white;
+        }
+        
+        .btn-logout {
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
         .history-title {
             color: #333;
             font-size: 18px;
@@ -213,11 +224,54 @@
             cursor: pointer;
             font-size: 14px;
         }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        
+        .user-info span {
+            margin-left: 12px;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="card">
+        <!-- 登录页面 -->
+        <div class="card" id="loginCard">
+            <h1>💊 Did you take your medicine today?</h1>
+            <p class="subtitle">健康提醒小程序</p>
+            <p style="text-align: center; color: #666; margin-bottom: 24px;">
+                登录后可同步数据到云端
+            </p>
+            <button class="btn btn-login" onclick="login()">
+                🚀 使用 Google 账号登录
+            </button>
+        </div>
+        
+        <!-- 主页面 -->
+        <div class="card" id="mainCard" style="display: none;">
+            <div class="user-info">
+                <div style="display: flex; align-items: center;">
+                    <img id="userAvatar" src="" alt="avatar" style="width: 40px; height: 40px; border-radius: 50%; display: none;">
+                    <span id="userName"></span>
+                </div>
+                <button class="btn btn-logout" onclick="logout()" style="width: auto; padding: 8px 16px; font-size: 14px; margin: 0;">
+                    退出
+                </button>
+            </div>
+            
             <h1>💊 Did you take your medicine today?</h1>
             <p class="subtitle">健康提醒小程序</p>
             <div class="date-display" id="dateDisplay"></div>
@@ -226,13 +280,13 @@
             <button class="btn btn-no" onclick="markNotTaken()">❌ 还没有</button>
         </div>
         
-        <div class="card">
+        <div class="card" id="medicineCard" style="display: none;">
             <h3 class="history-title">💊 我的药物</h3>
             <div id="medicineList"></div>
             <button class="btn btn-add" onclick="openModal()">➕ 添加药物</button>
         </div>
         
-        <div class="card">
+        <div class="card" id="recordCard" style="display: none;">
             <h3 class="history-title">📊 今日记录</h3>
             <div id="todayRecord"></div>
         </div>
@@ -260,34 +314,149 @@
     </div>
 
     <script>
-        // 初始化
-        let medicines = JSON.parse(localStorage.getItem('medicines') || '[]');
-        let records = JSON.parse(localStorage.getItem('records') || '{}');
+        // API 配置
+        const API_BASE = 'https://user-auth-worker.aliboit888.workers.dev';
         
-        // 显示日期
-        const today = new Date();
-        const dateStr = today.toLocaleDateString('zh-CN', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            weekday: 'long'
-        });
-        document.getElementById('dateDisplay').textContent = dateStr;
+        // 状态
+        let medicines = [];
+        let records = {};
         
-        // 请求通知权限
-        if ('Notification' in window && Notification.permission === 'default') {
-            Notification.requestPermission();
+        function getToken() {
+            // 先从 URL 参数读取 token
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            if (urlToken) {
+                localStorage.setItem('auth_token', urlToken);
+                const email = params.get('email');
+                const name = params.get('name');
+                if (email) localStorage.setItem('user_email', email);
+                if (name) localStorage.setItem('user_name', name);
+                // 清除 URL 参数
+                window.history.replaceState({}, '', window.location.pathname);
+                return urlToken;
+            }
+            return localStorage.getItem('auth_token');
         }
         
-        // 检查是否需要提醒
-        checkReminders();
+        // 初始化
+        async function init() {
+            // 显示日期
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('dateDisplay').textContent = dateStr;
+            
+            // 请求通知权限
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            
+            // 检查登录状态
+            const token = getToken();
+            if (token) {
+                try {
+                    const response = await fetch(API_BASE + '/api/user', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (response.ok) {
+                        const user = await response.json();
+                        showMainPage(user);
+                    } else {
+                        // Token 无效，清除
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('user_email');
+                        localStorage.removeItem('user_name');
+                        showLoginPage();
+                    }
+                } catch (e) {
+                    showLoginPage();
+                }
+            } else {
+                showLoginPage();
+            }
+        }
+        
+        function showLoginPage() {
+            document.getElementById('loginCard').style.display = 'block';
+            document.getElementById('mainCard').style.display = 'none';
+            document.getElementById('medicineCard').style.display = 'none';
+            document.getElementById('recordCard').style.display = 'none';
+        }
+        
+        function showMainPage(user) {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('mainCard').style.display = 'block';
+            document.getElementById('medicineCard').style.display = 'block';
+            document.getElementById('recordCard').style.display = 'block';
+            
+            // 显示用户信息
+            const avatar = document.getElementById('userAvatar');
+            const nameEl = document.getElementById('userName');
+            if (user.picture) {
+                avatar.src = user.picture;
+                avatar.style.display = 'block';
+            }
+            nameEl.textContent = user.name || user.email;
+            
+            // 加载数据
+            loadMedicines();
+            loadRecords();
+            
+            // 启动提醒检查
+            checkReminders();
+        }
+        
+        // 登录
+        function login() {
+            window.location.href = API_BASE + '/auth/google';
+        }
+        
+        // 退出
+        function logout() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('user_name');
+            token = null;
+            showLoginPage();
+        }
+        
+        // 从 API 加载药物列表
+        async function loadMedicines() {
+            try {
+                const response = await fetch(API_BASE + '/api/medicines', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    medicines = await response.json();
+                    renderMedicines();
+                }
+            } catch (e) {
+                console.error('Failed to load medicines:', e);
+            }
+        }
+        
+        // 从 API 加载记录
+        async function loadRecords() {
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await fetch(API_BASE + '/api/records?date=' + today, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (response.ok) {
+                    const takenList = await response.json();
+                    records[today] = takenList.map(r => r.name);
+                    renderTodayRecord();
+                }
+            } catch (e) {
+                console.error('Failed to load records:', e);
+            }
+        }
         
         // 渲染药物列表
-        renderMedicines();
-        
-        // 渲染今日记录
-        renderTodayRecord();
-        
         function renderMedicines() {
             const list = document.getElementById('medicineList');
             if (medicines.length === 0) {
@@ -295,8 +464,9 @@
                 return;
             }
             
-            list.innerHTML = medicines.map((med, index) => {
-                const todayKey = getTodayKey();
+            const todayKey = new Date().toISOString().split('T')[0];
+            
+            list.innerHTML = medicines.map((med) => {
                 const taken = records[todayKey]?.includes(med.name);
                 return `
                     <div class="medicine-item">
@@ -308,15 +478,16 @@
                             <span class="medicine-status ${taken ? 'status-taken' : 'status-pending'}">
                                 ${taken ? '已服用' : '待服用'}
                             </span>
-                            <button class="delete-btn" onclick="deleteMedicine(${index})">删除</button>
+                            <button class="delete-btn" onclick="deleteMedicine(${med.id})">删除</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
         
+        // 渲染今日记录
         function renderTodayRecord() {
-            const todayKey = getTodayKey();
+            const todayKey = new Date().toISOString().split('T')[0];
             const takenList = records[todayKey] || [];
             const list = document.getElementById('todayRecord');
             
@@ -332,32 +503,31 @@
             `;
         }
         
-        function getTodayKey() {
-            return new Date().toISOString().split('T')[0];
-        }
-        
-        function markTaken() {
-            const todayKey = getTodayKey();
-            if (!records[todayKey]) {
-                records[todayKey] = [];
-            }
-            
-            // 将所有未服用的药物标记为已服用
-            medicines.forEach(med => {
-                if (!records[todayKey].includes(med.name)) {
-                    records[todayKey].push(med.name);
-                }
-            });
-            
-            localStorage.setItem('records', JSON.stringify(records));
-            renderMedicines();
-            renderTodayRecord();
-            
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('💊 服药记录', {
-                    body: '已记录今日服药！',
-                    icon: '💊'
+        // 标记已服用
+        async function markTaken() {
+            try {
+                const response = await fetch(API_BASE + '/api/records/mark-all', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
                 });
+                if (response.ok) {
+                    const result = await response.json();
+                    // 刷新记录
+                    await loadRecords();
+                    renderMedicines();
+                    
+                    if ('Notification' in window && Notification.permission === 'granted') {
+                        new Notification('💊 服药记录', {
+                            body: `已记录 ${result.count} 种药物！`,
+                            icon: '💊'
+                        });
+                    }
+                }
+            } catch (e) {
+                alert('记录失败，请重试');
             }
         }
         
@@ -373,7 +543,8 @@
             document.getElementById('addModal').classList.remove('active');
         }
         
-        function addMedicine() {
+        // 添加药物
+        async function addMedicine() {
             const name = document.getElementById('medicineName').value.trim();
             const time = document.getElementById('medicineTime').value;
             const dose = document.getElementById('medicineDose').value.trim();
@@ -383,21 +554,46 @@
                 return;
             }
             
-            medicines.push({ name, time, dose: dose || '1片' });
-            localStorage.setItem('medicines', JSON.stringify(medicines));
-            
-            closeModal();
-            document.getElementById('medicineName').value = '';
-            document.getElementById('medicineDose').value = '';
-            
-            renderMedicines();
+            try {
+                const response = await fetch(API_BASE + '/api/medicines', {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, time, dose: dose || '1片' })
+                });
+                
+                if (response.ok) {
+                    closeModal();
+                    document.getElementById('medicineName').value = '';
+                    document.getElementById('medicineDose').value = '';
+                    await loadMedicines();
+                } else {
+                    alert('添加失败，请重试');
+                }
+            } catch (e) {
+                alert('添加失败，请重试');
+            }
         }
         
-        function deleteMedicine(index) {
-            if (confirm('确定要删除这个药物吗？')) {
-                medicines.splice(index, 1);
-                localStorage.setItem('medicines', JSON.stringify(medicines));
-                renderMedicines();
+        // 删除药物
+        async function deleteMedicine(id) {
+            if (!confirm('确定要删除这个药物吗？')) return;
+            
+            try {
+                const response = await fetch(API_BASE + '/api/medicines?id=' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (response.ok) {
+                    await loadMedicines();
+                } else {
+                    alert('删除失败，请重试');
+                }
+            } catch (e) {
+                alert('删除失败，请重试');
             }
         }
         
@@ -409,7 +605,7 @@
                 
                 medicines.forEach(med => {
                     if (med.time === currentTime) {
-                        const todayKey = getTodayKey();
+                        const todayKey = new Date().toISOString().split('T')[0];
                         const taken = records[todayKey]?.includes(med.name);
                         
                         if (!taken && 'Notification' in window && Notification.permission === 'granted') {
@@ -421,8 +617,11 @@
                         }
                     }
                 });
-            }, 60000); // 每分钟检查一次
+            }, 60000);
         }
+        
+        // 启动
+        init();
     </script>
 </body>
 </html>

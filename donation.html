@@ -427,7 +427,7 @@
     
     <!-- PayPal SDK -->
     <!-- 注意：这是沙箱模式的 PayPal SDK，仅用于测试 -->
-    <script src="https://www.paypal.com/sdk/js?client-id=AXFe_7YOm2heKrOhULpyf6MuDf--1V2FBSVXKoue94nFc80kZa_DV9O7fC4XQOgljgwEqO2FhSpiyHah&currency=USD&intent=capture" data-sdk-integration-source="button-factory"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AYGILBVU0NDe6_Yb4Vi90JXKPa3nbrD0K00HVEOgSpDkWsfRrkkoS_FSOVezkQlKMazvb3zk3ZwDgiXF&currency=USD&intent=capture" data-sdk-integration-source="button-factory"></script>
     
     <script>
         let selectedAmount = 5;
@@ -527,7 +527,7 @@
             
             // 构建 PayPal 捐赠链接
             // 注意：这里使用 PayPal 的捐赠链接格式
-            const business = 'aliboit@qq.com'; // PayPal 收款邮箱
+            const business = 'sb-b0rrg50105248@business.example.com'; // PayPal 沙箱测试邮箱
             const returnUrl = encodeURIComponent(window.location.origin + '/donation.html?status=success');
             const cancelUrl = encodeURIComponent(window.location.origin + '/donation.html?status=cancel');
             

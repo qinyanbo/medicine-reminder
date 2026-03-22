@@ -364,9 +364,11 @@
                 <span>PayPal 捐赠为即时到账，捐赠前请确认。当前为测试模式，捐赠不会真正扣款。</span>
             </div>
             
-            <!-- PayPal 按钮 -->
+            <!-- PayPal 按钮容器 -->
             <div class="paypal-section">
-                <button class="paypal-btn" id="donateBtn" onclick="donateWithPayPal()">
+                <div id="paypal-button-container"></div>
+                <!-- 备用按钮（PayPal SDK 加载失败时显示） -->
+                <button class="paypal-btn" id="fallbackBtn" style="display: none;" onclick="openPayPalWindow()">
                     <span class="paypal-logo">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
                             <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.387 2.654-.186 5.718-3.656 6.787-1.564.48-3.32.576-5.024.576H10.12l-1.355 8.59h3.316a.641.641 0 0 0 .633-.54l.026-.17.5-3.185.032-.214.085-.534.02-.134.044-.277.02-.133a.641.641 0 0 1 .633-.54h.405c2.07 0 3.712-.469 4.716-1.528.513-.541.92-1.218 1.177-2.012a.641.641 0 0 1 .633-.54h.69c1.936 0 3.609-.575 4.81-1.992.481-.567.823-1.247 1.003-1.992.072-.285.104-.56.104-.82z"/>
@@ -434,10 +436,12 @@
         
         // 初始化 PayPal 按钮
         function initPayPalButton() {
+            const container = document.getElementById('paypal-button-container');
+            
             paypal.Buttons({
                 style: {
                     layout: 'vertical',
-                    color: 'blue',
+                    color: 'gold',
                     shape: 'rect',
                     label: 'paypal'
                 },
@@ -518,36 +522,20 @@
             }
         }
         
-        // 备用捐赠按钮（用于不支持 PayPal SDK 的情况）
-        function donateWithPayPal() {
+        // 备用捐赠方式：直接打开 PayPal 窗口
+        function openPayPalWindow() {
             if (selectedAmount <= 0) {
                 showToast('请选择或输入捐赠金额');
                 return;
             }
             
-            // 构建 PayPal 捐赠链接
-            // 注意：这里使用 PayPal 的捐赠链接格式
-            const business = 'sb-b0rrg50105248@business.example.com'; // PayPal 沙箱测试邮箱
+            const business = 'sb-b0rrg50105248@business.example.com';
             const returnUrl = encodeURIComponent(window.location.origin + '/donation.html?status=success');
             const cancelUrl = encodeURIComponent(window.location.origin + '/donation.html?status=cancel');
             
-            // PayPal 捐赠链接
-            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=${business}&item_name= Donation+for+Medicine+Reminder&amount=${selectedAmount}&currency_code=USD&return=${returnUrl}&cancel_return=${cancelUrl}`;
+            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=${business}&item_name=Donation+for+Medicine+Reminder&amount=${selectedAmount}&currency_code=USD&return=${returnUrl}&cancel_return=${cancelUrl}`;
             
-            // 打开 PayPal（这里先显示提示，实际使用时取消注释）
-            // window.open(paypalUrl, '_blank');
-            
-            // 当前先用 SDK 模式
-            showToast(`您选择了 $${selectedAmount} 的捐赠金额`);
-            
-            // 如果 PayPal SDK 加载成功，应该显示 PayPal 按钮而不是这个按钮
-            const container = document.getElementById('paypal-button-container');
-            if (container && container.children.length > 0) {
-                // SDK 已加载
-            } else {
-                // SDK 未加载，显示提示
-                showToast('PayPal 加载中，请稍候...');
-            }
+            window.open(paypalUrl, '_blank', 'width=600,height=700');
         }
         
         // 显示 Toast
@@ -581,19 +569,25 @@
             // 检查返回状态
             checkReturnStatus();
             
-            // 尝试初始化 PayPal 按钮
-            // 注意：由于使用了测试模式的 client-id，实际支付会失败
-            // 正式使用时需要替换为真实的 PayPal Client ID
+            // 等待 PayPal SDK 加载完成
             if (typeof paypal !== 'undefined') {
-                // 创建 PayPal 按钮容器（隐藏在备用按钮后面）
-                const paypalContainer = document.createElement('div');
-                paypalContainer.id = 'paypal-button-container';
-                paypalContainer.style.display = 'none';
-                document.querySelector('.paypal-section').appendChild(paypalContainer);
-                
-                // 初始化 PayPal SDK 按钮
+                // SDK 已加载，初始化 PayPal 按钮
                 initPayPalButton();
+            } else {
+                // SDK 加载失败，显示备用按钮
+                document.getElementById('fallbackBtn').style.display = 'block';
+                showToast('PayPal SDK 加载失败，请使用备用按钮');
             }
+        });
+        
+        // PayPal SDK 加载失败时的备用处理
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const container = document.getElementById('paypal-button-container');
+                if (container && container.children.length === 0) {
+                    document.getElementById('fallbackBtn').style.display = 'block';
+                }
+            }, 3000); // 等待 3 秒让 SDK 加载
         });
     </script>
 </body>

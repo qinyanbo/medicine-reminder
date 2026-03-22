@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 你今天吃药了吗？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+        
+        h2 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+        
+        /* 用户信息卡片 */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #667eea;
+        }
+        
+        .avatar-placeholder {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .profile-info {
+            flex: 1;
+        }
+        
+        .profile-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .profile-email {
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .verified-badge {
+            color: #34a853;
+            font-size: 12px;
+        }
+        
+        /* Google 账号标识 */
+        .google-account {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f5f5f5;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .google-icon {
+            width: 14px;
+            height: 14px;
+        }
+        
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 16px 8px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* 菜单列表 */
+        .menu-list {
+            list-style: none;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .icon-purple { background: #ede7f6; }
+        .icon-green { background: #e8f5e9; }
+        .icon-blue { background: #e3f2fd; }
+        .icon-orange { background: #fff3e0; }
+        .icon-red { background: #ffebee; }
+        
+        .menu-item-text {
+            flex: 1;
+        }
+        
+        .menu-item-title {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .menu-item-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 2px;
+        }
+        
+        .menu-arrow {
+            color: #ccc;
+            font-size: 18px;
+        }
+        
+        /* 登出按钮 */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-logout {
+            background: #ff4757;
+            color: white;
+        }
+        
+        .btn-logout:hover {
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.3);
+        }
+        
+        .btn-back {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-bottom: 12px;
+        }
+        
+        .btn-back:hover {
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        /* 提醒设置开关 */
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+        
+        /* 打卡日历预览 */
+        .calendar-preview {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 12px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .day-taken {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .day-missed {
+            background: #ffebee;
+            color: #ff4757;
+        }
+        
+        .day-empty {
+            background: #f5f5f5;
+            color: #ccc;
+        }
+        
+        .calendar-label {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+            margin-top: 8px;
+        }
+        
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回主页按钮 -->
+        <button class="btn btn-back" onclick="goBack()">
+            ← 返回主页
+        </button>
+        
+        <!-- 加载状态 -->
+        <div class="card" id="loadingCard">
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+        </div>
+        
+        <!-- 用户信息 -->
+        <div class="card" id="profileCard" style="display: none;">
+            <div class="profile-header">
+                <div id="avatarContainer">
+                    <div class="avatar-placeholder" id="avatarPlaceholder"></div>
+                    <img class="avatar" id="userAvatar" style="display: none;" alt="avatar">
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name" id="userName">加载中...</div>
+                    <div class="profile-email" id="userEmail">
+                        <span id="emailText"></span>
+                        <span class="verified-badge" id="verifiedBadge" style="display: none;">✓ 已验证</span>
+                    </div>
+                    <div class="google-account">
+                        <svg class="google-icon" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google 账号
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 统计数据 -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="statDays">-</div>
+                    <div class="stat-label">服药天数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statRate">-%</div>
+                    <div class="stat-label">依从率</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="statStreak">-</div>
+                    <div class="stat-label">连续打卡</div>
+                </div>
+            </div>
+            
+            <!-- 最近7天打卡预览 -->
+            <div>
+                <div class="calendar-preview" id="weekCalendar"></div>
+                <div class="calendar-label">近 7 天打卡情况</div>
+            </div>
+        </div>
+        
+        <!-- 设置菜单 -->
+        <div class="card" id="settingsCard" style="display: none;">
+            <h2>📌 提醒设置</h2>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-purple">🔔</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">浏览器通知</div>
+                            <div class="menu-item-desc">服药时间发送桌面提醒</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notificationToggle" onchange="toggleNotification()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </li>
+                <li class="menu-item" onclick="requestNotificationPermission()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-blue">📳</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">通知权限</div>
+                            <div class="menu-item-desc" id="notificationStatus">点击申请通知权限</div>
+                        </div>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 数据管理 -->
+        <div class="card" id="dataCard" style="display: none;">
+            <h2>📤 数据管理</h2>
+            <ul class="menu-list">
+                <li class="menu-item" onclick="exportData()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-green">📥</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">导出服药记录</div>
+                            <div class="menu-item-desc">下载 JSON 格式的历史数据</div>
+                        </div>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </li>
+                <li class="menu-item" onclick="exportMedicines()">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-orange">💊</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">导出药物列表</div>
+                            <div class="menu-item-desc">下载当前药物配置</div>
+                        </div>
+                    </div>
+                    <span class="menu-arrow">›</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 账号操作 -->
+        <div class="card" id="accountCard" style="display: none;">
+            <h2>🔐 账号安全</h2>
+            <ul class="menu-list">
+                <li class="menu-item">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-blue">🆔</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">账号 ID</div>
+                            <div class="menu-item-desc" id="accountId">-</div>
+                        </div>
+                    </div>
+                </li>
+                <li class="menu-item">
+                    <div class="menu-item-left">
+                        <div class="menu-icon icon-purple">📅</div>
+                        <div class="menu-item-text">
+                            <div class="menu-item-title">注册时间</div>
+                            <div class="menu-item-desc" id="joinDate">-</div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- 登出按钮 -->
+        <button class="btn btn-logout" id="logoutBtn" style="display: none;" onclick="logout()">
+            🚪 退出登录
+        </button>
+        
+        <!-- 版本信息 -->
+        <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 20px;">
+            💊 你今天吃药了吗？ v1.0
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // API 配置
+        const API_BASE = 'https://user-auth-worker.aliboit888.workers.dev';
+        const APP_URL = 'https://medicine-reminder.shop';
+        
+        let token = null;
+        let userData = null;
+        
+        // 获取 token
+        function getToken() {
+            const params = new URLSearchParams(window.location.search);
+            const urlToken = params.get('token');
+            if (urlToken) {
+                localStorage.setItem('auth_token', urlToken);
+                const email = params.get('email');
+                const name = params.get('name');
+                const picture = params.get('picture');
+                if (email) localStorage.setItem('user_email', email);
+                if (name) localStorage.setItem('user_name', name);
+                if (picture) localStorage.setItem('user_picture', picture);
+                window.history.replaceState({}, '', window.location.pathname);
+                return urlToken;
+            }
+            return localStorage.getItem('auth_token');
+        }
+        
+        // 初始化
+        async function init() {
+            token = getToken();
+            
+            if (!token) {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            try {
+                // 获取用户信息
+                const response = await fetch(API_BASE + '/api/user', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Unauthorized');
+                }
+                
+                userData = await response.json();
+                renderProfile(userData);
+                
+                // 获取统计数据
+                await loadStats();
+                
+                // 检查通知状态
+                checkNotificationStatus();
+                
+            } catch (e) {
+                console.error('Failed to load user:', e);
+                showToast('加载失败，请重新登录');
+                setTimeout(() => {
+                    logout();
+                }, 1500);
+            }
+        }
+        
+        // 渲染用户信息
+        function renderProfile(user) {
+            document.getElementById('loadingCard').style.display = 'none';
+            document.getElementById('profileCard').style.display = 'block';
+            document.getElementById('settingsCard').style.display = 'block';
+            document.getElementById('dataCard').style.display = 'block';
+            document.getElementById('accountCard').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            // 名称
+            const name = user.name || user.email.split('@')[0];
+            document.getElementById('userName').textContent = name;
+            document.getElementById('avatarPlaceholder').textContent = name.charAt(0).toUpperCase();
+            
+            // 邮箱
+            document.getElementById('emailText').textContent = user.email;
+            if (user.email) {
+                document.getElementById('verifiedBadge').style.display = 'inline';
+            }
+            
+            // 头像
+            if (user.picture) {
+                const avatar = document.getElementById('userAvatar');
+                avatar.src = user.picture;
+                avatar.style.display = 'block';
+                document.getElementById('avatarPlaceholder').style.display = 'none';
+            }
+            
+            // 账号信息
+            document.getElementById('accountId').textContent = '#' + user.id;
+            if (user.created_at) {
+                const date = new Date(user.created_at);
+                document.getElementById('joinDate').textContent = date.toLocaleDateString('zh-CN');
+            }
+        }
+        
+        // 加载统计数据
+        async function loadStats() {
+            try {
+                // 获取所有药物
+                const medRes = await fetch(API_BASE + '/api/medicines', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                const medicines = medRes.ok ? await medRes.json() : [];
+                
+                // 计算统计数据
+                let totalDays = 0;
+                let streak = 0;
+                const today = new Date();
+                const weekDays = [];
+                
+                // 获取近30天的记录来计算依从率
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    const recordRes = await fetch(API_BASE + '/api/records?date=' + dateStr, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (recordRes.ok) {
+                        const records = await recordRes.json();
+                        if (records.length > 0) {
+                            totalDays++;
+                            if (i < 7) {
+                                weekDays.unshift({ date: dateStr, taken: true });
+                            }
+                            // 计算连续打卡
+                            if (i === 0 || (i === 1 && records.length > 0)) {
+                                streak++;
+                            }
+                        } else if (i < 7) {
+                            weekDays.unshift({ date: dateStr, taken: false });
+                        }
+                    } else if (i < 7) {
+                        weekDays.unshift({ date: dateStr, taken: false });
+                    }
+                }
+                
+                // 计算连续打卡（从今天往前）
+                streak = 0;
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    const recordRes = await fetch(API_BASE + '/api/records?date=' + dateStr, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (recordRes.ok) {
+                        const records = await recordRes.json();
+                        if (records.length > 0) {
+                            streak++;
+                        } else if (i > 0) {
+                            break;
+                        }
+                    }
+                }
+                
+                // 渲染统计
+                document.getElementById('statDays').textContent = totalDays;
+                document.getElementById('statStreak').textContent = streak + '天';
+                
+                // 依从率 = 服药天数 / (药物数量 * 实际天数) * 100
+                const daysSinceRegistration = Math.ceil((today - new Date(userData.created_at)) / (1000 * 60 * 60 * 24));
+                const expectedDays = medicines.length * daysSinceRegistration;
+                const rate = expectedDays > 0 ? Math.round((totalDays / Math.min(expectedDays, 30)) * 100) : 0;
+                document.getElementById('statRate').textContent = Math.min(rate, 100) + '%';
+                
+                // 渲染周打卡
+                renderWeekCalendar(weekDays);
+                
+            } catch (e) {
+                console.error('Failed to load stats:', e);
+            }
+        }
+        
+        // 渲染周打卡日历
+        function renderWeekCalendar(days) {
+            const container = document.getElementById('weekCalendar');
+            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            
+            // 确保有7天
+            while (days.length < 7) {
+                const date = new Date();
+                date.setDate(date.getDate() - days.length);
+                days.unshift({ date: date.toISOString().split('T')[0], taken: false });
+            }
+            
+            container.innerHTML = days.map((d, i) => {
+                const date = new Date(d.date);
+                const dayName = dayNames[date.getDay()];
+                const isToday = d.date === new Date().toISOString().split('T')[0];
+                
+                let className = 'day-empty';
+                let text = dayName;
+                if (d.taken) {
+                    className = 'day-taken';
+                } else if (!isToday && d.date < new Date().toISOString().split('T')[0]) {
+                    className = 'day-missed';
+                }
+                
+                return `<div class="calendar-day ${className}">${text}</div>`;
+            }).join('');
+        }
+        
+        // 检查通知状态
+        function checkNotificationStatus() {
+            if (!('Notification' in window)) {
+                document.getElementById('notificationStatus').textContent = '浏览器不支持通知';
+                document.getElementById('notificationToggle').disabled = true;
+                return;
+            }
+            
+            const status = Notification.permission;
+            const statusEl = document.getElementById('notificationStatus');
+            
+            if (status === 'granted') {
+                statusEl.textContent = '已授权 ✓';
+                document.getElementById('notificationToggle').checked = true;
+            } else if (status === 'denied') {
+                statusEl.textContent = '已被拒绝，请在浏览器设置中开启';
+                document.getElementById('notificationToggle').disabled = true;
+            } else {
+                statusEl.textContent = '未授权';
+            }
+        }
+        
+        // 请求通知权限
+        async function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                showToast('浏览器不支持通知功能');
+                return;
+            }
+            
+            const permission = await Notification.requestPermission();
+            checkNotificationStatus();
+            
+            if (permission === 'granted') {
+                showToast('通知权限已授权');
+            } else if (permission === 'denied') {
+                showToast('通知权限被拒绝');
+            }
+        }
+        
+        // 切换通知开关
+        function toggleNotification() {
+            if (Notification.permission === 'default') {
+                requestNotificationPermission();
+            } else if (Notification.permission !== 'granted') {
+                document.getElementById('notificationToggle').checked = false;
+                showToast('请先授权通知权限');
+            }
+        }
+        
+        // 导出服药记录
+        async function exportData() {
+            try {
+                const records = [];
+                const today = new Date();
+                
+                showToast('正在导出...');
+                
+                // 导出近30天记录
+                for (let i = 0; i < 30; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    const res = await fetch(API_BASE + '/api/records?date=' + dateStr, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    
+                    if (res.ok) {
+                        const dayRecords = await res.json();
+                        if (dayRecords.length > 0) {
+                            records.push(...dayRecords.map(r => ({
+                                date: dateStr,
+                                medicine: r.name,
+                                dose: r.dose,
+                                taken_at: r.taken_at
+                            })));
+                        }
+                    }
+                }
+                
+                downloadJSON(records, 'medicine-records.json');
+                showToast('服药记录已导出');
+                
+            } catch (e) {
+                showToast('导出失败');
+            }
+        }
+        
+        // 导出药物列表
+        async function exportMedicines() {
+            try {
+                const res = await fetch(API_BASE + '/api/medicines', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!res.ok) throw new Error();
+                
+                const medicines = await res.json();
+                downloadJSON(medicines, 'medicines.json');
+                showToast('药物列表已导出');
+                
+            } catch (e) {
+                showToast('导出失败');
+            }
+        }
+        
+        // 下载 JSON 文件
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 返回主页
+        function goBack() {
+            window.location.href = 'medicine-reminder.html';
+        }
+        
+        // 登出
+        function logout() {
+            if (!confirm('确定要退出登录吗？')) return;
+            
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_picture');
+            token = null;
+            
+            showToast('已退出登录');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        }
+        
+        // 显示 Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+        
+        // 启动
+        init();
+    </script>
+</body>
+</html>

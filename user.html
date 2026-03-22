@@ -589,11 +589,22 @@
                 
             } catch (e) {
                 console.error('Failed to load user:', e);
-                showToast('加载失败，请重新登录');
-                setTimeout(() => {
-                    logout();
-                }, 1500);
+                // 401 表示 token 无效或过期，直接清除并跳转
+                clearAuthAndRedirect();
             }
+        }
+        
+        // 清除认证并跳转登录页（不弹确认框）
+        function clearAuthAndRedirect() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user_email');
+            localStorage.removeItem('user_name');
+            localStorage.removeItem('user_picture');
+            token = null;
+            showToast('登录已过期，请重新登录');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1500);
         }
         
         // 渲染用户信息

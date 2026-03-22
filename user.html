@@ -568,33 +568,71 @@
                 return;
             }
             
+            // 从 localStorage 获取用户基本信息（登录时已存储）
+            const storedEmail = localStorage.getItem('user_email');
+            const storedName = localStorage.getItem('user_name');
+            const storedPicture = localStorage.getItem('user_picture');
+            
+            if (!storedEmail) {
+                showToast('用户信息不存在，请重新登录');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+                return;
+            }
+            
+            // 直接使用本地存储的用户信息显示
+            userData = {
+                email: storedEmail,
+                name: storedName || storedEmail.split('@')[0],
+                picture: storedPicture || ''
+            };
+            renderProfile(userData);
+            
+            // 尝试从 API 获取完整信息（包括 id、注册时间等）
             try {
-                // 获取用户信息
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                
                 const response = await fetch(API_BASE + '/api/user', {
+                    method: 'GET',
                     headers: { 
                         'Authorization': 'Bearer ' + token,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    credentials: 'include',
+                    mode: 'cors',
+                    signal: controller.signal
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Unauthorized: ' + response.status);
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const apiUser = await response.json();
+                    // 更新用户信息（如果 API 返回更完整的数据）
+                    if (apiUser.id) userData.id = apiUser.id;
+                    if (apiUser.created_at) userData.created_at = apiUser.created_at;
+                    if (apiUser.picture && !userData.picture) userData.picture = apiUser.picture;
+                    renderProfile(userData);
                 }
-                
-                userData = await response.json();
-                renderProfile(userData);
-                
-                // 获取统计数据
-                await loadStats();
-                
-                // 检查通知状态
-                checkNotificationStatus();
-                
             } catch (e) {
-                console.error('Failed to load user:', e.message, 'Token:', token);
-                // 401 表示 token 无效或过期，直接清除并跳转
-                clearAuthAndRedirect(e.message);
+                console.warn('API call failed, using localStorage data:', e.message);
+                // API 失败不影响显示，使用本地存储的数据继续
             }
+            
+            // 获取统计数据（可能失败，不影响主流程）
+            try {
+                await loadStats();
+            } catch (e) {
+                console.warn('Failed to load stats:', e.message);
+                // 统计加载失败，显示为空
+                document.getElementById('statDays').textContent = '-';
+                document.getElementById('statRate').textContent = '-%';
+                document.getElementById('statStreak').textContent = '-';
+            }
+            
+            // 检查通知状态
+            checkNotificationStatus();
         }
         
         // 清除认证并跳转登录页（不弹确认框）

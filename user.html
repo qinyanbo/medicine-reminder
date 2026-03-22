@@ -571,11 +571,14 @@
             try {
                 // 获取用户信息
                 const response = await fetch(API_BASE + '/api/user', {
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    headers: { 
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
                 });
                 
                 if (!response.ok) {
-                    throw new Error('Unauthorized');
+                    throw new Error('Unauthorized: ' + response.status);
                 }
                 
                 userData = await response.json();
@@ -588,23 +591,23 @@
                 checkNotificationStatus();
                 
             } catch (e) {
-                console.error('Failed to load user:', e);
+                console.error('Failed to load user:', e.message, 'Token:', token);
                 // 401 表示 token 无效或过期，直接清除并跳转
-                clearAuthAndRedirect();
+                clearAuthAndRedirect(e.message);
             }
         }
         
         // 清除认证并跳转登录页（不弹确认框）
-        function clearAuthAndRedirect() {
+        function clearAuthAndRedirect(reason) {
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_email');
             localStorage.removeItem('user_name');
             localStorage.removeItem('user_picture');
             token = null;
-            showToast('登录已过期，请重新登录');
+            showToast('登录已过期，请重新登录 (' + (reason || 'API错误') + ')');
             setTimeout(() => {
                 window.location.href = 'login.html';
-            }, 1500);
+            }, 2000);
         }
         
         // 渲染用户信息

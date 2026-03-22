@@ -342,15 +342,20 @@
 </head>
 <body>
     <div class="container">
-        <!-- 右上角登录/用户信息 -->
-        <div id="userSection" style="text-align: right; margin-bottom: 16px;">
-            <a href="login.html" id="loginLink" class="btn" style="display: inline-block; width: auto; padding: 10px 20px; text-decoration: none; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; border-radius: 10px; font-size: 14px;"> Sign In </a>
-            <div id="userInfo" style="display: none; align-items: center; justify-content: flex-end; gap: 12px;">
-                <a href="user.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <img id="userAvatar" src="" alt="avatar" style="width: 36px; height: 36px; border-radius: 50%; cursor: pointer;">
-                    <span id="userName" style="color: white; font-weight: 600; cursor: pointer;"></span>
-                </a>
-                <button onclick="logout()" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">退出</button>
+        <!-- 顶部导航栏 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <a href="donation.html" style="text-decoration: none; color: white; font-size: 14px; padding: 8px 16px; background: rgba(255,255,255,0.15); border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                💝 捐赠
+            </a>
+            <div style="text-align: right;">
+                <a href="login.html" id="loginLink" class="btn" style="display: inline-block; width: auto; padding: 10px 20px; text-decoration: none; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; border-radius: 10px; font-size: 14px;"> Sign In </a>
+                <div id="userInfo" style="display: none; align-items: center; justify-content: flex-end; gap: 12px;">
+                    <a href="user.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
+                        <img id="userAvatar" src="" alt="avatar" style="width: 36px; height: 36px; border-radius: 50%; cursor: pointer;">
+                        <span id="userName" style="color: white; font-weight: 600; cursor: pointer;"></span>
+                    </a>
+                    <button onclick="logout()" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">退出</button>
+                </div>
             </div>
         </div>
         

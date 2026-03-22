@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💝 捐赠支持 - 你今天吃药了吗？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        /* 顶部导航 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .back-btn {
+            text-decoration: none;
+            color: white;
+            font-size: 14px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .page-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .placeholder {
+            width: 80px;
+        }
+        
+        /* 标题区域 */
+        .donation-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .donation-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        /* 金额选择 */
+        .amount-section {
+            margin-bottom: 24px;
+        }
+        
+        .amount-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .amount-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .amount-btn {
+            padding: 16px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .amount-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .amount-btn.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .custom-amount {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .custom-amount span {
+            font-size: 18px;
+            color: #666;
+        }
+        
+        .custom-amount input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .custom-amount input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        /* PayPal 按钮 */
+        .paypal-section {
+            margin-bottom: 24px;
+        }
+        
+        .paypal-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0070ba 0%, #003087 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .paypal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,112,186,0.3);
+        }
+        
+        .paypal-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .paypal-logo {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        /* 信息区域 */
+        .info-section {
+            text-align: center;
+        }
+        
+        .info-title {
+            color: #333;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .info-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .feature-icon {
+            font-size: 20px;
+        }
+        
+        .feature-text {
+            font-size: 13px;
+            color: #333;
+        }
+        
+        /* 安全提示 */
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px;
+            background: #f0f9f0;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #2e7d32;
+            margin-top: 16px;
+        }
+        
+        /* 感谢语 */
+        .thanks-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        .thanks-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+        
+        .thanks-text {
+            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .thanks-subtext {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        /* 分割线 */
+        .divider {
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+        
+        /* 捐赠记录提示 */
+        .donation-note {
+            background: #fff8e1;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #f57c00;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .donation-note-icon {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 顶部导航 -->
+        <div class="top-bar">
+            <a href="medicine-reminder.html" class="back-btn">
+                ← 返回
+            </a>
+            <span class="page-title">💝 捐赠支持</span>
+            <div class="placeholder"></div>
+        </div>
+        
+        <!-- 捐赠卡片 -->
+        <div class="card">
+            <div class="donation-header">
+                <div class="donation-icon">💝</div>
+                <h1>请我喝杯咖啡 ☕</h1>
+                <p class="subtitle">
+                    如果「你今天吃药了吗？」这个小工具帮到了你，<br>
+                    欢迎请我喝杯咖啡，支持我继续维护更新！
+                </p>
+            </div>
+            
+            <!-- 金额选择 -->
+            <div class="amount-section">
+                <div class="amount-title">选择捐赠金额</div>
+                
+                <div class="amount-grid">
+                    <button class="amount-btn" data-amount="3" onclick="selectAmount(3)">$3</button>
+                    <button class="amount-btn selected" data-amount="5" onclick="selectAmount(5)">$5</button>
+                    <button class="amount-btn" data-amount="10" onclick="selectAmount(10)">$10</button>
+                    <button class="amount-btn" data-amount="15" onclick="selectAmount(15)">$15</button>
+                    <button class="amount-btn" data-amount="20" onclick="selectAmount(20)">$20</button>
+                    <button class="amount-btn" data-amount="50" onclick="selectAmount(50)">$50</button>
+                </div>
+                
+                <div class="custom-amount">
+                    <span>$</span>
+                    <input type="number" id="customAmount" placeholder="自定义金额" min="1" max="500" oninput="onCustomAmountChange()">
+                </div>
+            </div>
+            
+            <!-- 捐赠提示 -->
+            <div class="donation-note">
+                <span class="donation-note-icon">ℹ️</span>
+                <span>PayPal 捐赠为即时到账，捐赠前请确认。当前为测试模式，捐赠不会真正扣款。</span>
+            </div>
+            
+            <!-- PayPal 按钮 -->
+            <div class="paypal-section">
+                <button class="paypal-btn" id="donateBtn" onclick="donateWithPayPal()">
+                    <span class="paypal-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                            <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.387 2.654-.186 5.718-3.656 6.787-1.564.48-3.32.576-5.024.576H10.12l-1.355 8.59h3.316a.641.641 0 0 0 .633-.54l.026-.17.5-3.185.032-.214.085-.534.02-.134.044-.277.02-.133a.641.641 0 0 1 .633-.54h.405c2.07 0 3.712-.469 4.716-1.528.513-.541.92-1.218 1.177-2.012a.641.641 0 0 1 .633-.54h.69c1.936 0 3.609-.575 4.81-1.992.481-.567.823-1.247 1.003-1.992.072-.285.104-.56.104-.82z"/>
+                        </svg>
+                    </span>
+                    使用 PayPal 捐赠
+                </button>
+            </div>
+            
+            <div class="security-note">
+                <span>🔒</span>
+                安全支付 via PayPal
+            </div>
+        </div>
+        
+        <!-- 功能说明 -->
+        <div class="card">
+            <div class="info-section">
+                <div class="info-title">💪 你的支持会用在哪里</div>
+                <div class="features">
+                    <div class="feature-item">
+                        <span class="feature-icon">☁️</span>
+                        <span class="feature-text">服务器费用</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🚀</span>
+                        <span class="feature-text">新功能开发</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🐛</span>
+                        <span class="feature-text">bug 修复</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">😊</span>
+                        <span class="feature-text">持续维护</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 感谢区域 -->
+        <div class="card" id="thanksCard" style="display: none;">
+            <div class="thanks-section">
+                <div class="thanks-icon">🙏</div>
+                <div class="thanks-text">感谢你的支持！</div>
+                <div class="thanks-subtext">你的捐赠是我继续维护的动力</div>
+            </div>
+        </div>
+        
+        <!-- 版本信息 -->
+        <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 20px;">
+            💊 你今天吃药了吗？ v1.0 · 感谢每一份支持
+        </div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <!-- PayPal SDK -->
+    <!-- 注意：这是沙箱模式的 PayPal SDK，仅用于测试 -->
+    <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD&intent=capture" data-sdk-integration-source="button-factory"></script>
+    
+    <script>
+        let selectedAmount = 5;
+        
+        // 初始化 PayPal 按钮
+        function initPayPalButton() {
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'blue',
+                    shape: 'rect',
+                    label: 'paypal'
+                },
+                
+                // 创建订单
+                createOrder: function(data, actions) {
+                    if (selectedAmount <= 0) {
+                        showToast('请选择或输入捐赠金额');
+                        return;
+                    }
+                    
+                    return actions.order.create({
+                        purchase_units: [{
+                            description: '捐赠给「你今天吃药了吗？」',
+                            amount: {
+                                value: selectedAmount.toFixed(2)
+                            }
+                        }]
+                    });
+                },
+                
+                // 支付成功
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        // 显示感谢
+                        document.getElementById('thanksCard').style.display = 'block';
+                        showToast('感谢您的捐赠！🙏');
+                        
+                        // 隐藏捐赠表单
+                        document.querySelector('.amount-section').style.display = 'none';
+                        document.querySelector('.paypal-section').style.display = 'none';
+                        
+                        // 返回按钮变为返回主页
+                        document.querySelector('.back-btn').href = 'medicine-reminder.html';
+                    });
+                },
+                
+                // 取消支付
+                onCancel: function(data) {
+                    showToast('捐赠已取消');
+                },
+                
+                // 支付出错
+                onError: function(err) {
+                    console.error('PayPal Error:', err);
+                    showToast('支付出错，请稍后重试');
+                }
+            }).render('#paypal-button-container');
+        }
+        
+        // 选择金额
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            
+            // 更新按钮样式
+            document.querySelectorAll('.amount-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (parseInt(btn.dataset.amount) === amount) {
+                    btn.classList.add('selected');
+                }
+            });
+            
+            // 清空自定义输入
+            document.getElementById('customAmount').value = '';
+        }
+        
+        // 自定义金额变化
+        function onCustomAmountChange() {
+            const customInput = document.getElementById('customAmount');
+            const value = parseFloat(customInput.value);
+            
+            if (value > 0) {
+                selectedAmount = value;
+                // 取消所有预设金额的选中状态
+                document.querySelectorAll('.amount-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+            }
+        }
+        
+        // 备用捐赠按钮（用于不支持 PayPal SDK 的情况）
+        function donateWithPayPal() {
+            if (selectedAmount <= 0) {
+                showToast('请选择或输入捐赠金额');
+                return;
+            }
+            
+            // 构建 PayPal 捐赠链接
+            // 注意：这里使用 PayPal 的捐赠链接格式
+            const business = 'your-paypal-email@example.com'; // 需要替换为真实的 PayPal 邮箱
+            const returnUrl = encodeURIComponent(window.location.origin + '/donation.html?status=success');
+            const cancelUrl = encodeURIComponent(window.location.origin + '/donation.html?status=cancel');
+            
+            // PayPal 捐赠链接
+            const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=${business}&item_name= Donation+for+Medicine+Reminder&amount=${selectedAmount}&currency_code=USD&return=${returnUrl}&cancel_return=${cancelUrl}`;
+            
+            // 打开 PayPal（这里先显示提示，实际使用时取消注释）
+            // window.open(paypalUrl, '_blank');
+            
+            // 当前先用 SDK 模式
+            showToast(`您选择了 $${selectedAmount} 的捐赠金额`);
+            
+            // 如果 PayPal SDK 加载成功，应该显示 PayPal 按钮而不是这个按钮
+            const container = document.getElementById('paypal-button-container');
+            if (container && container.children.length > 0) {
+                // SDK 已加载
+            } else {
+                // SDK 未加载，显示提示
+                showToast('PayPal 加载中，请稍候...');
+            }
+        }
+        
+        // 显示 Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+        
+        // 检查 URL 参数（捐赠返回）
+        function checkReturnStatus() {
+            const params = new URLSearchParams(window.location.search);
+            const status = params.get('status');
+            
+            if (status === 'success') {
+                document.getElementById('thanksCard').style.display = 'block';
+                document.querySelector('.amount-section').style.display = 'none';
+                document.querySelector('.paypal-section').style.display = 'none';
+                showToast('感谢您的捐赠！🙏');
+            } else if (status === 'cancel') {
+                showToast('捐赠已取消');
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查返回状态
+            checkReturnStatus();
+            
+            // 尝试初始化 PayPal 按钮
+            // 注意：由于使用了测试模式的 client-id，实际支付会失败
+            // 正式使用时需要替换为真实的 PayPal Client ID
+            if (typeof paypal !== 'undefined') {
+                // 创建 PayPal 按钮容器（隐藏在备用按钮后面）
+                const paypalContainer = document.createElement('div');
+                paypalContainer.id = 'paypal-button-container';
+                paypalContainer.style.display = 'none';
+                document.querySelector('.paypal-section').appendChild(paypalContainer);
+                
+                // 初始化 PayPal SDK 按钮
+                initPayPalButton();
+            }
+        });
+    </script>
+</body>
+</html>

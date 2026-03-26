@@ -328,6 +328,39 @@
             box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
         }
         
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .lang-switcher select {
+            appearance: none;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            color: white;
+            padding: 8px 32px 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .lang-switcher select option {
+            background: #667eea;
+            color: white;
+        }
+        
+        .lang-switcher::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: white;
+            pointer-events: none;
+        }
+        
         @media (max-width: 480px) {
             .card {
                 padding: 20px;
@@ -352,9 +385,17 @@
     <div class="container">
         <!-- 顶部导航栏 -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <a href="donation.html" style="text-decoration: none; color: white; font-size: 14px; padding: 8px 16px; background: rgba(255,255,255,0.15); border-radius: 20px; display: flex; align-items: center; gap: 6px;">
-                💝 捐赠
-            </a>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <a href="donation.html" style="text-decoration: none; color: white; font-size: 14px; padding: 8px 16px; background: rgba(255,255,255,0.15); border-radius: 20px; display: flex; align-items: center; gap: 6px;">
+                    💝 <span class="i18n" data-key="donate">捐赠</span>
+                </a>
+                <div class="lang-switcher">
+                    <select id="langSelect" onchange="switchLanguage(this.value)">
+                        <option value="zh">中文</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
             <div style="text-align: right;">
                 <a href="login.html" id="loginLink" class="btn" style="display: inline-block; width: auto; padding: 10px 20px; text-decoration: none; background: linear-gradient(135deg, #4285f4 0%, #34a853 100%); color: white; border-radius: 10px; font-size: 14px;"> Sign In </a>
                 <div id="userInfo" style="display: none; align-items: center; justify-content: flex-end; gap: 12px;">
@@ -369,24 +410,24 @@
         
         <!-- 主页 -->
         <div class="card" id="mainCard">
-            <h1>💊 你今天吃药了吗？</h1>
-            <p class="subtitle">健康提醒小程序</p>
+            <h1 class="i18n" data-key="title">💊 你今天吃药了吗？</h1>
+            <p class="subtitle i18n" data-key="subtitle">健康提醒小程序</p>
             <div class="date-display" id="dateDisplay"></div>
-            <div class="question">你今天吃药了吗？</div>
-            <button class="btn btn-yes" onclick="markAllTaken()">✅ 是的，吃过了</button>
-            <button class="btn btn-no" onclick="remindLater()">❌ 还没有</button>
+            <div class="question i18n" data-key="question">你今天吃药了吗？</div>
+            <button class="btn btn-yes i18n-btn" data-key="yesTaken" onclick="markAllTaken()">✅ 是的，吃过了</button>
+            <button class="btn btn-no i18n-btn" data-key="noNotYet" onclick="remindLater()">❌ 还没有</button>
         </div>
         
         <!-- 药物列表 -->
         <div class="card" id="medicineCard">
-            <h3 class="history-title">💊 我的药物</h3>
+            <h3 class="history-title i18n" data-key="myMedicines">💊 我的药物</h3>
             <div id="medicineList"></div>
-            <button class="btn btn-add" onclick="openAddModal()">➕ 添加药物</button>
+            <button class="btn btn-add i18n-btn" data-key="addMedicine" onclick="openAddModal()">➕ 添加药物</button>
         </div>
         
         <!-- 7天历史 -->
         <div class="card" id="historyCard">
-            <h3 class="history-title">📅 7天服药记录</h3>
+            <h3 class="history-title i18n" data-key="sevenDayRecord">📅 7天服药记录</h3>
             <div class="history-list" id="historyList"></div>
         </div>
     </div>
@@ -396,20 +437,20 @@
         <div class="modal-content">
             <div class="modal-title" id="modalTitle">添加新药物</div>
             <div class="input-group">
-                <label>药物名称 *</label>
+                <label class="i18n-label" data-key="medicineName">药物名称 *</label>
                 <input type="text" id="medicineName" placeholder="例如：维生素C">
             </div>
             <div class="input-group">
-                <label>提醒时间 *</label>
+                <label class="i18n-label" data-key="reminderTime">提醒时间 *</label>
                 <input type="time" id="medicineTime" value="09:00">
             </div>
             <div class="input-group">
-                <label>剂量说明</label>
+                <label class="i18n-label" data-key="doseInfo">剂量说明</label>
                 <input type="text" id="medicineDose" placeholder="例如：1片">
             </div>
             <div class="modal-buttons">
-                <button class="btn btn-close" onclick="closeModal()">取消</button>
-                <button class="btn btn-save" id="saveBtn" onclick="saveMedicine()">保存</button>
+                <button class="btn btn-close i18n-btn" data-key="cancel" onclick="closeModal()">取消</button>
+                <button class="btn btn-save i18n-btn" data-key="save" id="saveBtn" onclick="saveMedicine()">保存</button>
             </div>
         </div>
     </div>
@@ -422,20 +463,156 @@
         // 数据存储键名
         const STORAGE_MEDICINES = 'medicines';
         const STORAGE_RECORDS = 'records';
+        const STORAGE_LANG = 'language';
         
         // 状态
         let medicines = [];
         let records = {};  // { "2026-03-17": ["维生素C", "钙片"], ... }
         let editingMedicineId = null;
+        let currentLang = 'zh';
         
         // 登录状态
         const LOGIN_API = 'https://user-auth-worker.aliboit888.workers.dev';
         
+        // 翻译数据
+        const i18n = {
+            zh: {
+                donate: '捐赠',
+                signIn: 'Sign In',
+                logout: '退出',
+                title: '你今天吃药了吗？',
+                subtitle: '健康提醒小程序',
+                question: '你今天吃药了吗？',
+                yesTaken: '✅ 是的，吃过了',
+                noNotYet: '❌ 还没有',
+                myMedicines: '我的药物',
+                addMedicine: '添加药物',
+                sevenDayRecord: '7天服药记录',
+                addNewMedicine: '添加新药物',
+                medicineName: '药物名称',
+                medicineNamePlaceholder: '例如：维生素C',
+                reminderTime: '提醒时间',
+                doseInfo: '剂量说明',
+                dosePlaceholder: '例如：1片',
+                cancel: '取消',
+                save: '保存',
+                add: '添加',
+                edit: '编辑',
+                delete: '删除',
+                taken: '已服用',
+                pending: '待服用',
+                noMedicines: '暂无药物，请添加您的第一个药物',
+                notificationEnabled: '🔔 通知权限已开启',
+                notificationDisabled: '❌ 通知被禁用，请在浏览器设置中开启',
+                enableNotification: '开启通知权限，接收服药提醒',
+                clickToEnable: '点击开启',
+                recorded: '已记录今日服药！',
+                remindLater: '好的，记得稍后服用哦！',
+                pleaseEnterName: '请填写药物名称',
+                pleaseSelectTime: '请选择提醒时间',
+                confirmDelete: '确定要删除这个药物吗？',
+                loggedOut: '已退出登录'
+            },
+            en: {
+                donate: 'Donate',
+                signIn: 'Sign In',
+                logout: 'Logout',
+                title: '💊 Did You Take Your Medicine?',
+                subtitle: 'Health Reminder App',
+                question: 'Did you take your medicine today?',
+                yesTaken: '✅ Yes, I did',
+                noNotYet: '❌ Not yet',
+                myMedicines: 'My Medicines',
+                addMedicine: 'Add Medicine',
+                sevenDayRecord: '7-Day Medication Record',
+                addNewMedicine: 'Add New Medicine',
+                medicineName: 'Medicine Name',
+                medicineNamePlaceholder: 'e.g., Vitamin C',
+                reminderTime: 'Reminder Time',
+                doseInfo: 'Dosage',
+                dosePlaceholder: 'e.g., 1 tablet',
+                cancel: 'Cancel',
+                save: 'Save',
+                add: 'Add',
+                edit: 'Edit',
+                delete: 'Delete',
+                taken: 'Taken',
+                pending: 'Pending',
+                noMedicines: 'No medicines yet. Add your first medicine!',
+                notificationEnabled: '🔔 Notifications enabled',
+                notificationDisabled: '❌ Notifications disabled. Please enable in browser settings.',
+                enableNotification: 'Enable notifications to receive reminders',
+                clickToEnable: 'Click to enable',
+                recorded: '✅ Today\'s medication recorded!',
+                remindLater: 'Okay, remember to take it later!',
+                pleaseEnterName: 'Please enter medicine name',
+                pleaseSelectTime: 'Please select reminder time',
+                confirmDelete: 'Are you sure you want to delete this medicine?',
+                loggedOut: 'Logged out successfully'
+            }
+        };
+        
+        // 切换语言
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem(STORAGE_LANG, lang);
+            applyTranslations();
+            renderUI();
+        }
+        
+        // 应用翻译到所有 i18n 元素
+        function applyTranslations() {
+            const t = i18n[currentLang];
+            
+            // 处理文本元素
+            document.querySelectorAll('.i18n').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+            
+            // 处理按钮文本
+            document.querySelectorAll('.i18n-btn').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+            
+            // 处理标签文本
+            document.querySelectorAll('.i18n-label').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+            
+            // 处理 placeholder
+            const namePlaceholder = currentLang === 'en' ? 'e.g., Vitamin C' : '例如：维生素C';
+            const dosePlaceholder = currentLang === 'en' ? 'e.g., 1 tablet' : '例如：1片';
+            document.getElementById('medicineName').placeholder = namePlaceholder;
+            document.getElementById('medicineDose').placeholder = dosePlaceholder;
+            
+            // 更新 document title
+            document.title = t.title;
+            
+            // 更新语言选择器
+            document.getElementById('langSelect').value = currentLang;
+        }
+        
         // 初始化
         function init() {
+            // 加载语言设置
+            const savedLang = localStorage.getItem(STORAGE_LANG);
+            if (savedLang) {
+                currentLang = savedLang;
+            }
+            
             // 检查登录状态
             checkLoginStatus();
             loadData();
+            applyTranslations();
             renderUI();
             requestNotificationPermission();
             startReminderCheck();
@@ -477,6 +654,7 @@
             } else {
                 // 未登录，显示登录按钮
                 document.getElementById('loginLink').style.display = 'inline-block';
+                document.getElementById('loginLink').textContent = i18n[currentLang].signIn;
                 document.getElementById('userInfo').style.display = 'none';
             }
         }
@@ -488,7 +666,7 @@
             localStorage.removeItem('user_name');
             localStorage.removeItem('user_picture');
             checkLoginStatus();
-            alert('已退出登录');
+            alert(i18n[currentLang].loggedOut);
         }
         
         // 从 LocalStorage 加载数据
@@ -540,7 +718,8 @@
         // 显示日期
         function renderDate() {
             const today = new Date();
-            const dateStr = today.toLocaleDateString('zh-CN', { 
+            const locale = currentLang === 'en' ? 'en-US' : 'zh-CN';
+            const dateStr = today.toLocaleDateString(locale, { 
                 year: 'numeric', 
                 month: 'long', 
                 day: 'numeric',
@@ -556,12 +735,13 @@
             const takenToday = records[todayKey] || [];
             
             if (medicines.length === 0) {
-                list.innerHTML = '<div class="empty-state">暂无药物，请添加您的第一个药物</div>';
+                list.innerHTML = `<div class="empty-state">${i18n[currentLang].noMedicines}</div>`;
                 return;
             }
             
             list.innerHTML = medicines.map(med => {
                 const taken = takenToday.includes(med.name);
+                const t = i18n[currentLang];
                 return `
                     <div class="medicine-item">
                         <div class="medicine-info">
@@ -570,10 +750,10 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="medicine-status ${taken ? 'status-taken' : 'status-pending'}">
-                                ${taken ? '✅ 已服用' : '⏳ 待服用'}
+                                ${taken ? '✅ ' + t.taken : '⏳ ' + t.pending}
                             </span>
-                            <button class="edit-btn" onclick="editMedicine(${med.id})">编辑</button>
-                            <button class="delete-btn" onclick="deleteMedicine(${med.id})">删除</button>
+                            <button class="edit-btn" onclick="editMedicine(${med.id})">${t.edit}</button>
+                            <button class="delete-btn" onclick="deleteMedicine(${med.id})">${t.delete}</button>
                         </div>
                     </div>
                 `;
@@ -584,7 +764,10 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             const today = new Date();
-            const dayNames = ['日', '一', '二', '三', '四', '五', '六'];
+            const dayNames = currentLang === 'en' 
+                ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                : ['日', '一', '二', '三', '四', '五', '六'];
+            const weekPrefix = currentLang === 'en' ? '' : '周';
             
             let html = '';
             for (let i = 6; i >= 0; i--) {
@@ -609,7 +792,7 @@
                 
                 html += `
                     <div class="history-day">
-                        <span class="history-day-name">周${dayName}</span>
+                        <span class="history-day-name">${weekPrefix}${dayName}</span>
                         <span class="history-day-date">${dayNum}</span>
                         <span class="history-day-status">${status}</span>
                     </div>
@@ -642,29 +825,31 @@
             renderHistory();
             
             // 显示通知
+            const t = i18n[currentLang];
             if (takenToday.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
-                new Notification('💊 服药记录成功', {
-                    body: `已记录 ${takenToday.length} 种药物，今日服药完成！`,
+                new Notification('💊 ' + (currentLang === 'en' ? 'Medication Recorded' : '服药记录成功'), {
+                    body: `${currentLang === 'en' ? `Recorded ${takenToday.length} medicine(s). Done for today!` : `已记录 ${takenToday.length} 种药物，今日服药完成！`}`,
                     icon: '💊'
                 });
             }
             
-            alert('✅ 已记录今日服药！');
+            alert(t.recorded);
         }
         
         // 稍后提醒
         function remindLater() {
-            alert('好的，记得稍后服用哦！');
+            alert(i18n[currentLang].remindLater);
         }
         
         // 打开添加弹窗
         function openAddModal() {
+            const t = i18n[currentLang];
             editingMedicineId = null;
-            document.getElementById('modalTitle').textContent = '添加新药物';
+            document.getElementById('modalTitle').textContent = t.addNewMedicine;
             document.getElementById('medicineName').value = '';
             document.getElementById('medicineTime').value = '09:00';
             document.getElementById('medicineDose').value = '';
-            document.getElementById('saveBtn').textContent = '添加';
+            document.getElementById('saveBtn').textContent = t.add;
             document.getElementById('medicineModal').classList.add('active');
         }
         
@@ -673,12 +858,13 @@
             const med = medicines.find(m => m.id === id);
             if (!med) return;
             
+            const t = i18n[currentLang];
             editingMedicineId = id;
-            document.getElementById('modalTitle').textContent = '编辑药物';
+            document.getElementById('modalTitle').textContent = t.edit + ' ' + med.name;
             document.getElementById('medicineName').value = med.name;
             document.getElementById('medicineTime').value = med.time;
             document.getElementById('medicineDose').value = med.dose;
-            document.getElementById('saveBtn').textContent = '保存';
+            document.getElementById('saveBtn').textContent = t.save;
             document.getElementById('medicineModal').classList.add('active');
         }
         
@@ -692,15 +878,16 @@
         function saveMedicine() {
             const name = document.getElementById('medicineName').value.trim();
             const time = document.getElementById('medicineTime').value;
-            const dose = document.getElementById('medicineDose').value.trim() || '1片';
+            const dose = document.getElementById('medicineDose').value.trim() || (currentLang === 'en' ? '1 tablet' : '1片');
+            const t = i18n[currentLang];
             
             if (!name) {
-                alert('请填写药物名称');
+                alert(t.pleaseEnterName);
                 return;
             }
             
             if (!time) {
-                alert('请选择提醒时间');
+                alert(t.pleaseSelectTime);
                 return;
             }
             
@@ -730,7 +917,7 @@
         
         // 删除药物
         function deleteMedicine(id) {
-            if (!confirm('确定要删除这个药物吗？')) return;
+            if (!confirm(i18n[currentLang].confirmDelete)) return;
             
             medicines = medicines.filter(m => m.id !== id);
             saveData();
@@ -745,10 +932,13 @@
                 return;
             }
             
+            const t = i18n[currentLang];
             if (Notification.permission === 'granted') {
-                document.getElementById('notificationHint').textContent = '🔔 通知权限已开启';
+                document.getElementById('notificationHint').textContent = t.notificationEnabled;
             } else if (Notification.permission === 'denied') {
-                document.getElementById('notificationHint').innerHTML = '❌ 通知被禁用，请在浏览器设置中开启';
+                document.getElementById('notificationHint').innerHTML = t.notificationDisabled;
+            } else {
+                document.getElementById('notificationHint').innerHTML = `${t.enableNotification} <a href="#" onclick="requestNotification()">${t.clickToEnable}</a>`;
             }
         }
         
@@ -775,8 +965,8 @@
                 
                 medicines.forEach(med => {
                     if (med.time === currentTime && !takenToday.includes(med.name)) {
-                        new Notification('💊 服药提醒', {
-                            body: `该服用 ${med.name} (${med.dose}) 了！`,
+                        new Notification('💊 ' + (currentLang === 'en' ? 'Medication Reminder' : '服药提醒'), {
+                            body: `${currentLang === 'en' ? `Time to take ${med.name} (${med.dose})!` : `该服用 ${med.name} (${med.dose}) 了！`}`,
                             icon: '💊',
                             requireInteraction: true
                         });

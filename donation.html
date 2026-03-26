@@ -323,6 +323,39 @@
         .donation-note-icon {
             flex-shrink: 0;
         }
+        
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .lang-switcher select {
+            appearance: none;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            color: white;
+            padding: 8px 32px 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .lang-switcher select option {
+            background: #667eea;
+            color: white;
+        }
+        
+        .lang-switcher::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: white;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -330,18 +363,23 @@
         <!-- 顶部导航 -->
         <div class="top-bar">
             <a href="medicine-reminder.html" class="back-btn">
-                ← 返回
+                ← <span class="i18n" data-key="back">返回</span>
             </a>
-            <span class="page-title">💝 捐赠支持</span>
-            <div class="placeholder"></div>
+            <span class="page-title i18n" data-key="donateTitle">💝 捐赠支持</span>
+            <div class="lang-switcher">
+                <select id="langSelect" onchange="switchLanguage(this.value)">
+                    <option value="zh">中文</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
         </div>
         
         <!-- 捐赠卡片 -->
         <div class="card">
             <div class="donation-header">
                 <div class="donation-icon">💝</div>
-                <h1>请我喝杯咖啡 ☕</h1>
-                <p class="subtitle">
+                <h1 class="i18n" data-key="buyMeCoffee">请我喝杯咖啡 ☕</h1>
+                <p class="subtitle i18n" data-key="donationSubtitle">
                     如果「你今天吃药了吗？」这个小工具帮到了你，<br>
                     欢迎请我喝杯咖啡，支持我继续维护更新！
                 </p>
@@ -349,7 +387,7 @@
             
             <!-- 金额选择 -->
             <div class="amount-section">
-                <div class="amount-title">选择捐赠金额</div>
+                <div class="amount-title i18n" data-key="selectAmount">选择捐赠金额</div>
                 
                 <div class="amount-grid">
                     <button class="amount-btn" data-amount="3" onclick="selectAmount(3)">$3</button>
@@ -369,7 +407,7 @@
             <!-- 捐赠提示 -->
             <div class="donation-note">
                 <span class="donation-note-icon">ℹ️</span>
-                <span>PayPal 捐赠为即时到账，捐赠前请确认。</span>
+                <span class="i18n" data-key="donationNote">PayPal 捐赠为即时到账，捐赠前请确认。</span>
             </div>
             
             <!-- PayPal 按钮容器 -->
@@ -382,36 +420,36 @@
                             <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c1.387 2.654-.186 5.718-3.656 6.787-1.564.48-3.32.576-5.024.576H10.12l-1.355 8.59h3.316a.641.641 0 0 0 .633-.54l.026-.17.5-3.185.032-.214.085-.534.02-.134.044-.277.02-.133a.641.641 0 0 1 .633-.54h.405c2.07 0 3.712-.469 4.716-1.528.513-.541.92-1.218 1.177-2.012a.641.641 0 0 1 .633-.54h.69c1.936 0 3.609-.575 4.81-1.992.481-.567.823-1.247 1.003-1.992.072-.285.104-.56.104-.82z"/>
                         </svg>
                     </span>
-                    使用 PayPal 捐赠
+                    <span class="i18n" data-key="paypalBtn">使用 PayPal 捐赠</span>
                 </button>
             </div>
             
             <div class="security-note">
                 <span>🔒</span>
-                安全支付 via PayPal
+                <span class="i18n" data-key="securePayment">安全支付 via PayPal</span>
             </div>
         </div>
         
         <!-- 功能说明 -->
         <div class="card">
             <div class="info-section">
-                <div class="info-title">💪 你的支持会用在哪里</div>
+                <div class="info-title i18n" data-key="supportTitle">💪 你的支持会用在哪里</div>
                 <div class="features">
                     <div class="feature-item">
                         <span class="feature-icon">☁️</span>
-                        <span class="feature-text">服务器费用</span>
+                        <span class="feature-text i18n" data-key="serverCost">服务器费用</span>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">🚀</span>
-                        <span class="feature-text">新功能开发</span>
+                        <span class="feature-text i18n" data-key="newFeature">新功能开发</span>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">🐛</span>
-                        <span class="feature-text">bug 修复</span>
+                        <span class="feature-text i18n" data-key="bugFix">bug 修复</span>
                     </div>
                     <div class="feature-item">
                         <span class="feature-icon">😊</span>
-                        <span class="feature-text">持续维护</span>
+                        <span class="feature-text i18n" data-key="maintenance">持续维护</span>
                     </div>
                 </div>
             </div>
@@ -421,14 +459,14 @@
         <div class="card" id="thanksCard" style="display: none;">
             <div class="thanks-section">
                 <div class="thanks-icon">🙏</div>
-                <div class="thanks-text">感谢你的支持！</div>
-                <div class="thanks-subtext">你的捐赠是我继续维护的动力</div>
+                <div class="thanks-text i18n" data-key="thanksText">感谢你的支持！</div>
+                <div class="thanks-subtext i18n" data-key="thanksSubtext">你的捐赠是我继续维护的动力</div>
             </div>
         </div>
         
         <!-- 版本信息 -->
         <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 20px;">
-            💊 你今天吃药了吗？ v1.0 · 感谢每一份支持
+            💊 <span class="i18n" data-key="appName">你今天吃药了吗？</span> v1.0 · <span class="i18n" data-key="thankSupport">感谢每一份支持</span>
         </div>
     </div>
     
@@ -439,11 +477,106 @@
     <script src="https://www.paypal.com/sdk/js?client-id=AXFe_7YOm2heKrOhULpyf6MuDf--1V2FBSVXKoue94nFc80kZa_DV9O7fC4XQOgljgwEqO2FhSpiyHah&currency=USD&intent=capture" data-sdk-integration-source="button-factory"></script>
     
     <script>
+        const STORAGE_LANG = 'language';
+        let currentLang = 'zh';
+        
+        // 翻译数据
+        const i18n = {
+            zh: {
+                back: '返回',
+                donateTitle: '💝 捐赠支持',
+                buyMeCoffee: '请我喝杯咖啡 ☕',
+                donationSubtitle: '如果「你今天吃药了吗？」这个小工具帮到了你，<br>欢迎请我喝杯咖啡，支持我继续维护更新！',
+                selectAmount: '选择捐赠金额',
+                donationNote: 'PayPal 捐赠为即时到账，捐赠前请确认。',
+                paypalBtn: '使用 PayPal 捐赠',
+                securePayment: '安全支付 via PayPal',
+                supportTitle: '💪 你的支持会用在哪里',
+                serverCost: '服务器费用',
+                newFeature: '新功能开发',
+                bugFix: 'bug 修复',
+                maintenance: '持续维护',
+                thanksText: '感谢你的支持！',
+                thanksSubtext: '你的捐赠是我继续维护的动力',
+                appName: '你今天吃药了吗？',
+                thankSupport: '感谢每一份支持',
+                customAmountPlaceholder: '自定义金额',
+                selectDonationAmount: '请选择或输入捐赠金额',
+                donationSuccess: '感谢您的捐赠！🙏',
+                donationCancelled: '捐赠已取消',
+                paymentError: '支付出错，请稍后重试',
+                paypalSdkError: 'PayPal SDK 加载失败，请使用备用按钮'
+            },
+            en: {
+                back: 'Back',
+                donateTitle: '💝 Donate',
+                buyMeCoffee: 'Buy Me a Coffee ☕',
+                donationSubtitle: 'If "Did You Take Your Medicine?" helped you,<br>please buy me a coffee to support its maintenance!',
+                selectAmount: 'Select Donation Amount',
+                donationNote: 'PayPal donations are instant. Please confirm before donating.',
+                paypalBtn: 'Donate with PayPal',
+                securePayment: 'Secure payment via PayPal',
+                supportTitle: '💪 Where Your Support Goes',
+                serverCost: 'Server Costs',
+                newFeature: 'New Features',
+                bugFix: 'Bug Fixes',
+                maintenance: 'Ongoing Maintenance',
+                thanksText: 'Thank You for Your Support!',
+                thanksSubtext: 'Your donation motivates me to keep maintaining',
+                appName: 'Did You Take Your Medicine?',
+                thankSupport: 'Thanks for every bit of support',
+                customAmountPlaceholder: 'Custom amount',
+                selectDonationAmount: 'Please select or enter a donation amount',
+                donationSuccess: 'Thank you for your donation! 🙏',
+                donationCancelled: 'Donation cancelled',
+                paymentError: 'Payment error, please try again later',
+                paypalSdkError: 'PayPal SDK failed to load. Please use the backup button.'
+            }
+        };
+        
+        // 切换语言
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem(STORAGE_LANG, lang);
+            applyTranslations();
+        }
+        
+        // 应用翻译
+        function applyTranslations() {
+            const t = i18n[currentLang];
+            
+            document.querySelectorAll('.i18n').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    el.innerHTML = t[key];
+                }
+            });
+            
+            // 更新 placeholder
+            document.getElementById('customAmount').placeholder = t.customAmountPlaceholder;
+            
+            // 更新 document title
+            document.title = t.donateTitle + ' - ' + t.appName;
+            
+            // 更新语言选择器
+            document.getElementById('langSelect').value = currentLang;
+        }
+        
+        // 页面加载时初始化语言
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem(STORAGE_LANG);
+            if (savedLang) {
+                currentLang = savedLang;
+            }
+            applyTranslations();
+        });
+        
         let selectedAmount = 5;
         
         // 初始化 PayPal 按钮
         function initPayPalButton() {
             const container = document.getElementById('paypal-button-container');
+            const t = i18n[currentLang];
             
             paypal.Buttons({
                 style: {
@@ -456,13 +589,13 @@
                 // 创建订单
                 createOrder: function(data, actions) {
                     if (selectedAmount <= 0) {
-                        showToast('请选择或输入捐赠金额');
+                        showToast(t.selectDonationAmount);
                         return;
                     }
                     
                     return actions.order.create({
                         purchase_units: [{
-                            description: '捐赠给「你今天吃药了吗？」',
+                            description: 'Donation for ' + t.appName,
                             amount: {
                                 value: selectedAmount.toFixed(2)
                             }
@@ -475,7 +608,7 @@
                     return actions.order.capture().then(function(details) {
                         // 显示感谢
                         document.getElementById('thanksCard').style.display = 'block';
-                        showToast('感谢您的捐赠！🙏');
+                        showToast(t.donationSuccess);
                         
                         // 隐藏捐赠表单
                         document.querySelector('.amount-section').style.display = 'none';
@@ -488,13 +621,13 @@
                 
                 // 取消支付
                 onCancel: function(data) {
-                    showToast('捐赠已取消');
+                    showToast(t.donationCancelled);
                 },
                 
                 // 支付出错
                 onError: function(err) {
                     console.error('PayPal Error:', err);
-                    showToast('支付出错，请稍后重试');
+                    showToast(t.paymentError);
                 }
             }).render('#paypal-button-container');
         }
@@ -531,8 +664,9 @@
         
         // 备用捐赠方式：直接打开 PayPal 窗口
         function openPayPalWindow() {
+            const t = i18n[currentLang];
             if (selectedAmount <= 0) {
-                showToast('请选择或输入捐赠金额');
+                showToast(t.selectDonationAmount);
                 return;
             }
             
@@ -560,14 +694,15 @@
         function checkReturnStatus() {
             const params = new URLSearchParams(window.location.search);
             const status = params.get('status');
+            const t = i18n[currentLang];
             
             if (status === 'success') {
                 document.getElementById('thanksCard').style.display = 'block';
                 document.querySelector('.amount-section').style.display = 'none';
                 document.querySelector('.paypal-section').style.display = 'none';
-                showToast('感谢您的捐赠！🙏');
+                showToast(t.donationSuccess);
             } else if (status === 'cancel') {
-                showToast('捐赠已取消');
+                showToast(t.donationCancelled);
             }
         }
         
@@ -583,7 +718,7 @@
             } else {
                 // SDK 加载失败，显示备用按钮
                 document.getElementById('fallbackBtn').style.display = 'block';
-                showToast('PayPal SDK 加载失败，请使用备用按钮');
+                showToast(i18n[currentLang].paypalSdkError);
             }
         });
         

@@ -403,7 +403,7 @@
                         <img id="userAvatar" src="" alt="avatar" style="width: 36px; height: 36px; border-radius: 50%; cursor: pointer;">
                         <span id="userName" style="color: white; font-weight: 600; cursor: pointer;"></span>
                     </a>
-                    <button onclick="logout()" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">退出</button>
+                    <button onclick="logout()" class="i18n-btn" data-key="logout" style="padding: 8px 16px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">退出</button>
                 </div>
             </div>
         </div>
@@ -650,6 +650,11 @@
                 if (userPicture) {
                     document.getElementById('userAvatar').src = userPicture;
                     document.getElementById('userAvatar').style.display = 'block';
+                }
+                // 更新退出按钮文字
+                const logoutBtn = document.querySelector('#userInfo button.i18n-btn');
+                if (logoutBtn) {
+                    logoutBtn.textContent = i18n[currentLang].logout;
                 }
             } else {
                 // 未登录，显示登录按钮

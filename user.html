@@ -357,6 +357,40 @@
             opacity: 1;
         }
         
+        /* 语言切换器 */
+        .lang-switcher {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .lang-switcher select {
+            appearance: none;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 20px;
+            color: white;
+            padding: 8px 32px 8px 14px;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .lang-switcher select option {
+            background: #667eea;
+            color: white;
+        }
+        
+        .lang-switcher::after {
+            content: '▼';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: white;
+            pointer-events: none;
+        }
+        
         /* 加载状态 */
         .loading {
             display: flex;
@@ -382,10 +416,18 @@
 </head>
 <body>
     <div class="container">
-        <!-- 返回主页按钮 -->
-        <button class="btn btn-back" onclick="goBack()">
-            ← 返回主页
-        </button>
+        <!-- 顶部导航 -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <button class="btn btn-back" onclick="goBack()" style="margin-bottom: 0; width: auto;">
+                ← <span class="i18n" data-key="backHome">返回主页</span>
+            </button>
+            <div class="lang-switcher">
+                <select id="langSelect" onchange="switchLanguage(this.value)">
+                    <option value="zh">中文</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+        </div>
         
         <!-- 加载状态 -->
         <div class="card" id="loadingCard">
@@ -402,10 +444,10 @@
                     <img class="avatar" id="userAvatar" style="display: none;" alt="avatar">
                 </div>
                 <div class="profile-info">
-                    <div class="profile-name" id="userName">加载中...</div>
+                    <div class="profile-name" id="userName">...</div>
                     <div class="profile-email" id="userEmail">
                         <span id="emailText"></span>
-                        <span class="verified-badge" id="verifiedBadge" style="display: none;">✓ 已验证</span>
+                        <span class="verified-badge" id="verifiedBadge" style="display: none;">✓ <span class="i18n" data-key="verified">已验证</span></span>
                     </div>
                     <div class="google-account">
                         <svg class="google-icon" viewBox="0 0 24 24">
@@ -414,7 +456,7 @@
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
-                        Google 账号
+                        <span class="i18n" data-key="googleAccount">Google 账号</span>
                     </div>
                 </div>
             </div>
@@ -423,35 +465,35 @@
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-value" id="statDays">-</div>
-                    <div class="stat-label">服药天数</div>
+                    <div class="stat-label i18n" data-key="medDays">服药天数</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="statRate">-%</div>
-                    <div class="stat-label">依从率</div>
+                    <div class="stat-label i18n" data-key="complianceRate">依从率</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-value" id="statStreak">-</div>
-                    <div class="stat-label">连续打卡</div>
+                    <div class="stat-label i18n" data-key="streak">连续打卡</div>
                 </div>
             </div>
             
             <!-- 最近7天打卡预览 -->
             <div>
                 <div class="calendar-preview" id="weekCalendar"></div>
-                <div class="calendar-label">近 7 天打卡情况</div>
+                <div class="calendar-label i18n" data-key="weekCheckin">近 7 天打卡情况</div>
             </div>
         </div>
         
         <!-- 设置菜单 -->
         <div class="card" id="settingsCard" style="display: none;">
-            <h2>📌 提醒设置</h2>
+            <h2>📌 <span class="i18n" data-key="reminderSettings">提醒设置</span></h2>
             <ul class="menu-list">
                 <li class="menu-item">
                     <div class="menu-item-left">
                         <div class="menu-icon icon-purple">🔔</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">浏览器通知</div>
-                            <div class="menu-item-desc">服药时间发送桌面提醒</div>
+                            <div class="menu-item-title i18n" data-key="browserNotification">浏览器通知</div>
+                            <div class="menu-item-desc i18n" data-key="notificationDesc">服药时间发送桌面提醒</div>
                         </div>
                     </div>
                     <label class="toggle-switch">
@@ -463,8 +505,8 @@
                     <div class="menu-item-left">
                         <div class="menu-icon icon-blue">📳</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">通知权限</div>
-                            <div class="menu-item-desc" id="notificationStatus">点击申请通知权限</div>
+                            <div class="menu-item-title i18n" data-key="notificationPerm">通知权限</div>
+                            <div class="menu-item-desc" id="notificationStatus"><span class="i18n" data-key="clickToRequest">点击申请通知权限</span></div>
                         </div>
                     </div>
                     <span class="menu-arrow">›</span>
@@ -474,14 +516,14 @@
         
         <!-- 数据管理 -->
         <div class="card" id="dataCard" style="display: none;">
-            <h2>📤 数据管理</h2>
+            <h2>📤 <span class="i18n" data-key="dataManagement">数据管理</span></h2>
             <ul class="menu-list">
                 <li class="menu-item" onclick="exportData()">
                     <div class="menu-item-left">
                         <div class="menu-icon icon-green">📥</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">导出服药记录</div>
-                            <div class="menu-item-desc">下载 JSON 格式的历史数据</div>
+                            <div class="menu-item-title i18n" data-key="exportRecords">导出服药记录</div>
+                            <div class="menu-item-desc i18n" data-key="exportRecordsDesc">下载 JSON 格式的历史数据</div>
                         </div>
                     </div>
                     <span class="menu-arrow">›</span>
@@ -490,8 +532,8 @@
                     <div class="menu-item-left">
                         <div class="menu-icon icon-orange">💊</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">导出药物列表</div>
-                            <div class="menu-item-desc">下载当前药物配置</div>
+                            <div class="menu-item-title i18n" data-key="exportMedicines">导出药物列表</div>
+                            <div class="menu-item-desc i18n" data-key="exportMedicinesDesc">下载当前药物配置</div>
                         </div>
                     </div>
                     <span class="menu-arrow">›</span>
@@ -501,13 +543,13 @@
         
         <!-- 账号操作 -->
         <div class="card" id="accountCard" style="display: none;">
-            <h2>🔐 账号安全</h2>
+            <h2>🔐 <span class="i18n" data-key="accountSecurity">账号安全</span></h2>
             <ul class="menu-list">
                 <li class="menu-item">
                     <div class="menu-item-left">
                         <div class="menu-icon icon-blue">🆔</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">账号 ID</div>
+                            <div class="menu-item-title i18n" data-key="accountId">账号 ID</div>
                             <div class="menu-item-desc" id="accountId">-</div>
                         </div>
                     </div>
@@ -516,7 +558,7 @@
                     <div class="menu-item-left">
                         <div class="menu-icon icon-purple">📅</div>
                         <div class="menu-item-text">
-                            <div class="menu-item-title">注册时间</div>
+                            <div class="menu-item-title i18n" data-key="joinDate">注册时间</div>
                             <div class="menu-item-desc" id="joinDate">-</div>
                         </div>
                     </div>
@@ -525,13 +567,13 @@
         </div>
         
         <!-- 登出按钮 -->
-        <button class="btn btn-logout" id="logoutBtn" style="display: none;" onclick="logout()">
-            🚪 退出登录
+        <button class="btn btn-logout i18n-btn" id="logoutBtn" style="display: none;" onclick="logout()">
+            🚪 <span class="i18n" data-key="logout">退出登录</span>
         </button>
         
         <!-- 版本信息 -->
         <div style="text-align: center; color: rgba(255,255,255,0.6); font-size: 12px; margin-top: 20px;">
-            💊 你今天吃药了吗？ v1.0
+            💊 <span class="i18n" data-key="appName">你今天吃药了吗？</span> v1.0
         </div>
     </div>
     
@@ -542,9 +584,130 @@
         // API 配置
         const API_BASE = 'https://user-auth-worker.aliboit888.workers.dev';
         const APP_URL = 'https://medicine-reminder.shop';
+        const STORAGE_LANG = 'language';
         
         let token = null;
         let userData = null;
+        let currentLang = 'zh';
+        
+        // 翻译数据
+        const i18n = {
+            zh: {
+                backHome: '返回主页',
+                verified: '已验证',
+                googleAccount: 'Google 账号',
+                medDays: '服药天数',
+                complianceRate: '依从率',
+                streak: '连续打卡',
+                weekCheckin: '近 7 天打卡情况',
+                reminderSettings: '提醒设置',
+                browserNotification: '浏览器通知',
+                notificationDesc: '服药时间发送桌面提醒',
+                notificationPerm: '通知权限',
+                clickToRequest: '点击申请通知权限',
+                dataManagement: '数据管理',
+                exportRecords: '导出服药记录',
+                exportRecordsDesc: '下载 JSON 格式的历史数据',
+                exportMedicines: '导出药物列表',
+                exportMedicinesDesc: '下载当前药物配置',
+                accountSecurity: '账号安全',
+                accountId: '账号 ID',
+                joinDate: '注册时间',
+                logout: '退出登录',
+                appName: '你今天吃药了吗？',
+                pleaseLogin: '请先登录',
+                userNotFound: '用户信息不存在，请重新登录',
+                sessionExpired: '登录已过期，请重新登录',
+                notificationEnabled: '通知权限已授权',
+                notificationDenied: '通知权限被拒绝',
+                notificationNotSupported: '浏览器不支持通知功能',
+                exporting: '正在导出...',
+                recordsExported: '服药记录已导出',
+                exportFailed: '导出失败',
+                medicinesExported: '药物列表已导出',
+                loggedOut: '已退出登录',
+                confirmLogout: '确定要退出登录吗？',
+                authorized: '已授权 ✓',
+                denied: '已被拒绝，请在浏览器设置中开启',
+                unauthorized: '未授权',
+                days: '天'
+            },
+            en: {
+                backHome: 'Back',
+                verified: 'Verified',
+                googleAccount: 'Google Account',
+                medDays: 'Days',
+                complianceRate: 'Rate',
+                streak: 'Streak',
+                weekCheckin: 'Last 7 Days Check-in',
+                reminderSettings: 'Reminder Settings',
+                browserNotification: 'Browser Notifications',
+                notificationDesc: 'Send desktop reminders at medication time',
+                notificationPerm: 'Notification Permission',
+                clickToRequest: 'Click to request permission',
+                dataManagement: 'Data Management',
+                exportRecords: 'Export Medication Records',
+                exportRecordsDesc: 'Download historical data in JSON format',
+                exportMedicines: 'Export Medicine List',
+                exportMedicinesDesc: 'Download current medicine configuration',
+                accountSecurity: 'Account Security',
+                accountId: 'Account ID',
+                joinDate: 'Join Date',
+                logout: 'Logout',
+                appName: 'Did You Take Your Medicine?',
+                pleaseLogin: 'Please login first',
+                userNotFound: 'User info not found. Please login again.',
+                sessionExpired: 'Session expired. Please login again.',
+                notificationEnabled: 'Notification permission granted',
+                notificationDenied: 'Notification permission denied',
+                notificationNotSupported: 'Browser does not support notifications',
+                exporting: 'Exporting...',
+                recordsExported: 'Medication records exported',
+                exportFailed: 'Export failed',
+                medicinesExported: 'Medicine list exported',
+                loggedOut: 'Logged out',
+                confirmLogout: 'Are you sure you want to logout?',
+                authorized: 'Authorized ✓',
+                denied: 'Denied. Please enable in browser settings.',
+                unauthorized: 'Not authorized',
+                days: 'days'
+            }
+        };
+        
+        // 切换语言
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem(STORAGE_LANG, lang);
+            applyTranslations();
+            checkNotificationStatus();
+        }
+        
+        // 应用翻译
+        function applyTranslations() {
+            const t = i18n[currentLang];
+            
+            document.querySelectorAll('.i18n').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (t[key]) {
+                    el.textContent = t[key];
+                }
+            });
+            
+            // 更新 document title
+            document.title = (currentLang === 'en' ? 'Profile' : '个人中心') + ' - ' + t.appName;
+            
+            // 更新语言选择器
+            document.getElementById('langSelect').value = currentLang;
+            
+            // 更新连续打卡天数
+            const streakEl = document.getElementById('statStreak');
+            if (streakEl && streakEl.textContent !== '-') {
+                const streakNum = streakEl.textContent.replace('天', '').replace('days', '');
+                if (streakNum && !isNaN(streakNum)) {
+                    streakEl.textContent = streakNum + t.days;
+                }
+            }
+        }
         
         // 获取 token
         function getToken() {
@@ -566,10 +729,17 @@
         
         // 初始化
         async function init() {
+            // 加载语言设置
+            const savedLang = localStorage.getItem(STORAGE_LANG);
+            if (savedLang) {
+                currentLang = savedLang;
+            }
+            applyTranslations();
+            
             token = getToken();
             
             if (!token) {
-                showToast('请先登录');
+                showToast(i18n[currentLang].pleaseLogin);
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 1500);
@@ -582,7 +752,7 @@
             const storedPicture = localStorage.getItem('user_picture');
             
             if (!storedEmail) {
-                showToast('用户信息不存在，请重新登录');
+                showToast(i18n[currentLang].userNotFound);
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 1500);
@@ -650,7 +820,7 @@
             localStorage.removeItem('user_name');
             localStorage.removeItem('user_picture');
             token = null;
-            showToast('登录已过期，请重新登录 (' + (reason || 'API错误') + ')');
+            showToast(i18n[currentLang].sessionExpired + ' (' + (reason || 'API Error') + ')');
             setTimeout(() => {
                 window.location.href = 'login.html';
             }, 2000);
@@ -759,7 +929,7 @@
                 
                 // 渲染统计
                 document.getElementById('statDays').textContent = totalDays;
-                document.getElementById('statStreak').textContent = streak + '天';
+                document.getElementById('statStreak').textContent = streak;
                 
                 // 依从率 = 服药天数 / (药物数量 * 实际天数) * 100
                 const daysSinceRegistration = Math.ceil((today - new Date(userData.created_at)) / (1000 * 60 * 60 * 24));
@@ -806,8 +976,9 @@
         
         // 检查通知状态
         function checkNotificationStatus() {
+            const t = i18n[currentLang];
             if (!('Notification' in window)) {
-                document.getElementById('notificationStatus').textContent = '浏览器不支持通知';
+                document.getElementById('notificationStatus').textContent = t.notificationNotSupported;
                 document.getElementById('notificationToggle').disabled = true;
                 return;
             }
@@ -816,20 +987,21 @@
             const statusEl = document.getElementById('notificationStatus');
             
             if (status === 'granted') {
-                statusEl.textContent = '已授权 ✓';
+                statusEl.textContent = t.authorized;
                 document.getElementById('notificationToggle').checked = true;
             } else if (status === 'denied') {
-                statusEl.textContent = '已被拒绝，请在浏览器设置中开启';
+                statusEl.textContent = t.denied;
                 document.getElementById('notificationToggle').disabled = true;
             } else {
-                statusEl.textContent = '未授权';
+                statusEl.textContent = t.unauthorized;
             }
         }
         
         // 请求通知权限
         async function requestNotificationPermission() {
+            const t = i18n[currentLang];
             if (!('Notification' in window)) {
-                showToast('浏览器不支持通知功能');
+                showToast(t.notificationNotSupported);
                 return;
             }
             
@@ -837,9 +1009,9 @@
             checkNotificationStatus();
             
             if (permission === 'granted') {
-                showToast('通知权限已授权');
+                showToast(t.notificationEnabled);
             } else if (permission === 'denied') {
-                showToast('通知权限被拒绝');
+                showToast(t.notificationDenied);
             }
         }
         
@@ -849,17 +1021,18 @@
                 requestNotificationPermission();
             } else if (Notification.permission !== 'granted') {
                 document.getElementById('notificationToggle').checked = false;
-                showToast('请先授权通知权限');
+                showToast(i18n[currentLang].unauthorized);
             }
         }
         
         // 导出服药记录
         async function exportData() {
+            const t = i18n[currentLang];
             try {
                 const records = [];
                 const today = new Date();
                 
-                showToast('正在导出...');
+                showToast(t.exporting);
                 
                 // 导出近30天记录
                 for (let i = 0; i < 30; i++) {
@@ -885,15 +1058,16 @@
                 }
                 
                 downloadJSON(records, 'medicine-records.json');
-                showToast('服药记录已导出');
+                showToast(t.recordsExported);
                 
             } catch (e) {
-                showToast('导出失败');
+                showToast(t.exportFailed);
             }
         }
         
         // 导出药物列表
         async function exportMedicines() {
+            const t = i18n[currentLang];
             try {
                 const res = await fetch(API_BASE + '/api/medicines', {
                     headers: { 'Authorization': 'Bearer ' + token }
@@ -903,10 +1077,10 @@
                 
                 const medicines = await res.json();
                 downloadJSON(medicines, 'medicines.json');
-                showToast('药物列表已导出');
+                showToast(t.medicinesExported);
                 
             } catch (e) {
-                showToast('导出失败');
+                showToast(t.exportFailed);
             }
         }
         
@@ -928,7 +1102,7 @@
         
         // 登出
         function logout() {
-            if (!confirm('确定要退出登录吗？')) return;
+            if (!confirm(i18n[currentLang].confirmLogout)) return;
             
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_email');
@@ -936,7 +1110,7 @@
             localStorage.removeItem('user_picture');
             token = null;
             
-            showToast('已退出登录');
+            showToast(i18n[currentLang].loggedOut);
             setTimeout(() => {
                 window.location.href = 'login.html';
             }, 1000);
